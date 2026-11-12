@@ -10,6 +10,7 @@ Small classic games as an installable, offline-capable PWA. One shared shell (ma
 | --- | --- |
 | Breakout | Left/Right move the paddle, A launches |
 | Blocks | Left/Right move, Down soft-drops, A or Up rotates, B hard-drops |
+| Space Rocks | Left/Right turn, Up thrusts, hold A to fire, B warps (risky) |
 | Side Shooter | D-pad moves the ship, hold A to fire |
 
 Every game runs inside a yellow brick-game handheld (layout after [react-tetris](https://chvin.github.io/react-tetris/)): four round buttons in a diamond, a big A and a smaller B, and small Pause / Menu / Reset buttons. The same buttons work on the keyboard: arrows or WASD, Z or Space = A, X = B, Enter or P = Pause/Start, R = Reset, Esc = back to the menu.
@@ -25,13 +26,13 @@ Third-party games (from [Libre Arcade](https://github.com/linkingtechnologies/li
 | Space Invaders | Left/Right move, A fires, Start begins |
 | Snake | D-pad steers, A starts |
 
-Breakout, Blocks and Side Shooter are written from scratch (vanilla JS + Canvas). High scores of those three are stored per game in `localStorage`.
+Breakout, Blocks, Space Rocks and Side Shooter are written from scratch (vanilla JS + Canvas). High scores of those four are stored per game in `localStorage`.
 
 ## Adding a game
 
 1. Add `games/<name>.html` (copy an existing game; `Arcade.mount()` from `games/common.js` builds the console, `Arcade.held` and `Arcade.on()` give you the buttons). To embed an existing web game instead, put it in `games/vendor/<name>/` (keeping its license), add it to `GAMES` in `games/play.html` with a key mapping, and list it in `THIRD_PARTY.md`.
 2. Add the game to `GAMES` in `index.html`.
-3. Add the file to `ASSETS` in `sw.js` and bump `CACHE` (e.g. `retro-arcade-v9`), otherwise existing installs will not receive the update.
+3. Add the file to `ASSETS` in `sw.js` and bump `CACHE` (e.g. `retro-arcade-v10`), otherwise existing installs will not receive the update.
 
 ## Running locally
 

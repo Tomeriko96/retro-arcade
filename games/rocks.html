@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Space Rocks</title>
+<link rel="stylesheet" href="console.css">
+</head>
+<body>
+<script src="nozoom.js"></script>
+<script src="common.js"></script>
+<script>
+// Left/Right turn, Up thrusts, hold A to fire, B jumps to a random spot (risky), Start pauses.
+const W = 360, H = 480, ID = 'rocks';
+const { ctx } = Arcade.mount({ title: 'Space Rocks', W, H, labels: { left: 'Turn', right: 'Turn', up: 'Thrust', down: null, a: 'Fire', b: 'Warp' } });
+const held = Arcade.held;
+const INK = Arcade.ink, MID = Arcade.mid, LCD = Arcade.lcd;
+
+const TAU = Math.PI * 2;
+const SIZES = [{ r: 9, pts: 100 }, { r: 17, pts: 50 }, { r: 30, pts: 20 }]; // index = size 0 small .. 2 large
+const rnd = (a, b) => a + Math.random() * (b - a);
+const wrap = (o) => { o.x = (o.x + W) % W; o.y = (o.y + H) % H; };
+
+let ship, bullets, rocks, score, lives, wave, state, fireT, respawnT, waveT; // ready | play | paused | over
+
+function makeRock(x, y, size) {
+  const n = 9 + Math.floor(Math.random() * 3), r = SIZES[size].r;
+  const shape = Array.from({ length: n }, (_, i) => ({ a: (i / n) * TAU, d: rnd(0.72, 1.15) }));
+  const sp = rnd(25, 55) * (3 - size * 0.55) / 2;
+  const dir = rnd(0, TAU);
+  return { x, y, size, r, shape, vx: Math.cos(dir) * sp, vy: Math.sin(dir) * sp, rot: rnd(0, TAU), spin: rnd(-1, 1) };
+}
+function spawnWave() {
+  rocks = [];
+  const n = Math.min(10, 3 + wave);
+  for (let i = 0; i < n; i++) {
+    let x, y;
+    do { x = rnd(0, W); y = rnd(0, H); } while (Math.hypot(x - W / 2, y - H / 2) < 110);
+    rocks.push(makeRock(x, y, 2));
+  }
+}
+function newShip() { return { x: W / 2, y: H / 2, vx: 0, vy: 0, a: -Math.PI / 2, inv: 2.2 }; }
+function reset() {
+  score = 0; lives = 3; wave = 1; bullets = []; fireT = 0; respawnT = 0; waveT = 0;
+  ship = newShip(); spawnWave(); state = 'ready';
+}
+function begin() { if (state === 'ready') state = 'play'; else if (state === 'over') reset(); }
+Arcade.on('a', begin);
+Arcade.on('start', () => {
+  if (state === 'play') state = 'paused'; else if (state === 'paused') state = 'play'; else begin();
+});
+Arcade.on('b', () => {
+  if (state !== 'play' || !ship) return;
+  ship.x = rnd(20, W - 20); ship.y = rnd(20, H - 20); ship.vx = ship.vy = 0; ship.inv = 0.6;
+  if (Math.random() < 0.12) killShip(); // warping is risky
+});
+
+function killShip() {
+  lives--; ship = null; respawnT = 1.5;
+  if (lives <= 0) { state = 'over'; Arcade.saveHi(ID, score); }
+}
+function hitRock(i) {
+  const r = rocks[i]; score += SIZES[r.size].pts; rocks.splice(i, 1);
+  if (r.size > 0) for (let k = 0; k < 2; k++) {
+    const c = makeRock(r.x, r.y, r.size - 1); c.vx += r.vx * 0.5; c.vy += r.vy * 0.5; rocks.push(c);
+  }
+}
+
+function update(dt) {
+  if (state !== 'play') return;
+  for (const r of rocks) { r.x += r.vx * dt; r.y += r.vy * dt; r.rot += r.spin * dt; wrap(r); }
+  for (const b of bullets) { b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt; wrap(b); }
+  bullets = bullets.filter((b) => b.life > 0);
+
+  if (ship) {
+    ship.a += ((held.right ? 1 : 0) - (held.left ? 1 : 0)) * 4 * dt;
+    if (held.up) { ship.vx += Math.cos(ship.a) * 240 * dt; ship.vy += Math.sin(ship.a) * 240 * dt; }
+    const f = Math.pow(0.55, dt); ship.vx *= f; ship.vy *= f; // gentle drag keeps it playable on a small screen
+    const sp = Math.hypot(ship.vx, ship.vy); if (sp > 260) { ship.vx *= 260 / sp; ship.vy *= 260 / sp; }
+    ship.x += ship.vx * dt; ship.y += ship.vy * dt; wrap(ship);
+    ship.inv = Math.max(0, ship.inv - dt);
+    fireT -= dt;
+    if (held.a && fireT <= 0 && bullets.length < 5) {
+      bullets.push({ x: ship.x + Math.cos(ship.a) * 12, y: ship.y + Math.sin(ship.a) * 12,
+        vx: ship.vx + Math.cos(ship.a) * 360, vy: ship.vy + Math.sin(ship.a) * 360, life: 0.9 });
+      fireT = 0.22;
+    }
+  } else {
+    respawnT -= dt;
+    // Respawn only once the middle of the screen is clear.
+    if (respawnT <= 0 && lives > 0 && rocks.every((r) => Math.hypot(r.x - W / 2, r.y - H / 2) > r.r + 60)) ship = newShip();
+  }
+
+  for (let bi = bullets.length - 1; bi >= 0; bi--) {
+    const b = bullets[bi];
+    for (let ri = rocks.length - 1; ri >= 0; ri--) {
+      if (Math.hypot(b.x - rocks[ri].x, b.y - rocks[ri].y) < rocks[ri].r * 0.9) { bullets.splice(bi, 1); hitRock(ri); break; }
+    }
+  }
+  if (ship && ship.inv <= 0) for (const r of rocks) {
+    if (Math.hypot(ship.x - r.x, ship.y - r.y) < r.r * 0.85 + 6) { killShip(); break; }
+  }
+  if (state === 'play' && rocks.length === 0) {
+    waveT += dt;
+    if (waveT > 1.2) { wave++; waveT = 0; spawnWave(); if (ship) ship.inv = 2; }
+  }
+}
+
+function text(t, x, y, size, color, align) {
+  ctx.fillStyle = color; ctx.font = `bold ${size}px ui-monospace, monospace`; ctx.textAlign = align || 'center'; ctx.fillText(t, x, y);
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+  for (const r of rocks) {
+    ctx.beginPath();
+    r.shape.forEach((p, i) => {
+      const x = r.x + Math.cos(p.a + r.rot) * r.r * p.d, y = r.y + Math.sin(p.a + r.rot) * r.r * p.d;
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    });
+    ctx.closePath(); ctx.stroke();
+  }
+  ctx.fillStyle = INK;
+  for (const b of bullets) ctx.fillRect(b.x - 1.5, b.y - 1.5, 3, 3);
+  if (ship && (ship.inv <= 0 || Math.floor(ship.inv * 10) % 2)) {
+    const c = Math.cos(ship.a), s = Math.sin(ship.a), px = (a, d) => [ship.x + Math.cos(ship.a + a) * d, ship.y + Math.sin(ship.a + a) * d];
+    ctx.beginPath();
+    const nose = px(0, 13), l = px(2.5, 10), r = px(-2.5, 10), bl = px(Math.PI + 0.35, 5), br = px(Math.PI - 0.35, 5);
+    ctx.moveTo(...nose); ctx.lineTo(...l); ctx.lineTo(...bl); ctx.lineTo(...br); ctx.lineTo(...r); ctx.closePath(); ctx.stroke();
+    if (held.up && Math.random() < 0.8) { ctx.beginPath(); ctx.moveTo(...px(Math.PI + 0.25, 6)); ctx.lineTo(...px(Math.PI, 14 + Math.random() * 5)); ctx.lineTo(...px(Math.PI - 0.25, 6)); ctx.stroke(); }
+  }
+  text('SCORE ' + score, 10, 24, 14, INK, 'left');
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 24, 14, MID);
+  text('♥'.repeat(Math.max(0, lives)), W - 10, 24, 14, INK, 'right');
+  text('WAVE ' + wave, 10, H - 10, 11, MID, 'left');
+  if (state === 'ready') { text('Left/Right turn, Up thrust', W / 2, H / 2 + 70, 13, INK); text('Hold A to fire', W / 2, H / 2 + 90, 13, INK); text('Press A to start', W / 2, H / 2 + 120, 15, INK); }
+  if (state === 'paused') text('PAUSED', W / 2, H / 2 - 40, 26, INK);
+  if (state === 'over') { text('GAME OVER', W / 2, H / 2 - 40, 26, INK); text('Press A to play again', W / 2, H / 2 - 12, 14, INK); }
+}
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.033, (now - last) / 1000); last = now;
+  update(dt); draw(); requestAnimationFrame(loop);
+}
+reset(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
