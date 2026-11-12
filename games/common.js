@@ -104,8 +104,20 @@ window.Arcade = (() => {
     handlers.select.push(() => { location.href = '../'; });
     handlers.reset.push(() => { location.reload(); });
     const cv = root.querySelector('canvas');
-    cv.width = W; cv.height = H;
-    return { cv, ctx: cv.getContext('2d'), wake };
+    const ctx = cv.getContext('2d');
+    // Games draw in W x H logical units. Keep the backing store at the size actually shown (x devicePixelRatio) so
+    // rectangles and text are rendered at native resolution instead of a small bitmap stretched to fit. The transform
+    // maps logical units to pixels; games set their own styles every frame, so resetting the context on resize is safe.
+    const fit = () => {
+      const r = cv.getBoundingClientRect();
+      const k = r.width ? Math.max(1, Math.min(r.width * (devicePixelRatio || 1) / W, Math.sqrt(8e6 / (W * H)))) : 1; // cap at ~8 megapixels
+      const pw = Math.round(W * k), ph = Math.round(H * k);
+      if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+      ctx.setTransform(pw / W, 0, 0, ph / H, 0, 0);
+    };
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(cv); else addEventListener('resize', fit);
+    return { cv, ctx, wake };
   }
 
   // Offline support must not depend on entering through the launcher (deep links, installed-app launches).

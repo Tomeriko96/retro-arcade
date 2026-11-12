@@ -118,4 +118,3 @@ button { font:inherit; touch-action:none; }
   .ui-toggle { border-color:ButtonText; color:ButtonText; }
   .legend kbd { border:1px solid CanvasText; }
 }
-canvas { image-rendering: pixelated; }
