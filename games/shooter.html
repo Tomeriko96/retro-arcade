@@ -11,7 +11,7 @@
 <script>
 // D-pad moves the ship, hold A to fire.
 const W = 540, H = 320, ID = 'shooter';
-const { ctx } = Arcade.mount({ title: 'Side Shooter', W, H });
+const { ctx } = Arcade.mount({ title: 'Side Shooter', W, H, labels: { a: 'Fire', b: null } });
 const held = Arcade.held;
 
 let ship, bullets, enemies, stars, score, lives, state, spawnT, fireT, t0; // ready | play | paused | over

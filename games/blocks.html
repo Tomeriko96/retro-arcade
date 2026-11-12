@@ -12,7 +12,7 @@
 // Left/Right move (hold to repeat), Down soft-drops, A or Up rotates, B hard-drops, Start pauses.
 const COLS = 10, ROWS = 20, C = 16, BX = 4;
 const W = 240, H = ROWS * C, ID = 'blocks';
-const { ctx } = Arcade.mount({ title: 'Blocks', W, H });
+const { ctx } = Arcade.mount({ title: 'Blocks', W, H, labels: { up: 'Rotation', a: 'Rotate', b: 'Drop' } });
 const held = Arcade.held;
 
 const SHAPES = {

@@ -22,17 +22,23 @@ const GAMES = [
   { id: 'breakout', title: 'Breakout', desc: 'Bounce the ball, break the bricks.', href: 'games/breakout.html' },
   { id: 'blocks',   title: 'Blocks', desc: 'Stack falling blocks and clear lines.', href: 'games/blocks.html' },
   { id: 'shooter',  title: 'Side Shooter', desc: 'Shoot down enemies in a side-scrolling level.', href: 'games/shooter.html' },
+  { title: 'Netris',            desc: 'Falling blocks. Port of Netris 0.52.', href: 'games/play.html?g=netris' },
+  { title: 'Hextris',           desc: 'Match blocks around a spinning hexagon.', href: 'games/play.html?g=hextris' },
+  { title: 'Asteroids Infinity', desc: 'Fly, shoot and survive the asteroid field.', href: 'games/play.html?g=asteroids' },
+  { title: 'Yanoid',            desc: 'Arkanoid-style brick breaker with power-ups.', href: 'games/play.html?g=yanoid' },
+  { title: 'Space Invaders',    desc: 'Defend Earth from the descending invaders.', href: 'games/play.html?g=invaders' },
+  { title: 'Snake',             desc: 'Eat, grow, do not hit yourself.', href: 'games/play.html?g=snake' },
 ];
 const grid = document.getElementById('grid');
 for (const g of GAMES) {
   let hi = 0;
-  try { hi = Number(localStorage.getItem('arcade:hi:' + g.id)) || 0; } catch (e) {}
+  if (g.id) { try { hi = Number(localStorage.getItem('arcade:hi:' + g.id)) || 0; } catch (e) {} }
   const a = document.createElement('a');
   a.className = 'card'; a.href = g.href;
   a.innerHTML = `<h2></h2><p></p><span class="hi"></span>`;
   a.querySelector('h2').textContent = g.title;
   a.querySelector('p').textContent = g.desc;
-  a.querySelector('.hi').textContent = 'High score: ' + hi;
+  if (g.id) a.querySelector('.hi').textContent = 'High score: ' + hi;
   grid.appendChild(a);
 }
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

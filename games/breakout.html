@@ -10,7 +10,7 @@
 <script src="common.js"></script>
 <script>
 const W = 360, H = 540, ID = 'breakout';
-const { ctx } = Arcade.mount({ title: 'Breakout', W, H });
+const { ctx } = Arcade.mount({ title: 'Breakout', W, H, labels: { up: null, down: null, a: 'Launch', b: null } });
 const held = Arcade.held;
 
 const COLS = 8, ROWS = 6, BW = W / COLS, BH = 20, TOP = 50;
