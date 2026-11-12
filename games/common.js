@@ -15,7 +15,8 @@ window.Arcade = (() => {
     if (held[name]) return;
     held[name] = true; paint(name);
     for (const w of watchers) w(name, true);
-    if (navigator.vibrate) navigator.vibrate(8);
+    // Haptic tick only on touch devices, and not for people who asked for reduced motion.
+    if (navigator.vibrate && matchMedia('(pointer: coarse)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) navigator.vibrate(8);
     for (const fn of handlers[name]) fn();
   }
   function release(name) { if (held[name]) { held[name] = false; paint(name); for (const w of watchers) w(name, false); } }
@@ -31,7 +32,8 @@ window.Arcade = (() => {
   addEventListener('keyup', (e) => { const n = KEYS[e.key.toLowerCase()]; if (n) release(n); });
   addEventListener('blur', () => NAMES.forEach(release));
   document.addEventListener('visibilitychange', () => { if (document.hidden) NAMES.forEach(release); });
-  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  // Long-press menus get in the way of the on-screen buttons and the game; everywhere else (credits, legend) they stay.
+  document.addEventListener('contextmenu', (e) => { if (e.target.closest && e.target.closest('.screen, .btn, .ui-toggle')) e.preventDefault(); });
 
   function bindButton(el, name) {
     (views[name] = views[name] || []).push(el);
@@ -62,11 +64,13 @@ window.Arcade = (() => {
     const rows = ['up', 'left', 'right', 'down', 'a', 'b'].filter((k) => L[k] !== null).map((k) => [KEYHINT[k], L[k]])
       .concat([['Enter / P', 'Pause'], ['R', 'Reset'], ['Esc', 'Menu']]);
     const legend = rows.map(([k, v]) => `<div class="row"><kbd>${k}</kbd>${v}</div>`).join('');
-    const root = document.createElement('div');
+    const root = document.createElement('main');
     root.className = 'gb';
     root.innerHTML = `
-      <div class="top"><a href="../">&larr; menu</a><span></span><button class="ui-toggle" type="button"></button></div>
-      <div class="screen"><canvas></canvas></div>
+      <h1 class="sr-only">${title} \u2013 Retro Arcade</h1>
+      <div id="arcade-live" class="sr-only" role="status" aria-live="polite"></div>
+      <div class="top"><a href="../" aria-label="Back to game menu" aria-keyshortcuts="Escape">&larr; menu</a><span aria-hidden="true"></span><button class="ui-toggle" type="button"></button></div>
+      <div class="screen"><canvas role="img" aria-label="${title} game screen"></canvas></div>
       <div class="left">
         <div class="small">
           <div class="btn green"><button data-k="start" aria-label="Pause"></button><label>Pause(P)</label></div>
@@ -77,7 +81,7 @@ window.Arcade = (() => {
       </div>
       <div class="right"><div class="diamond">
         ${btn('u', 'up')}${btn('l', 'left')}${btn('r', 'right')}${btn('d', 'down')}
-        <div class="mark"><i class="mu">&#9650;</i><i class="ml">&#9664;</i><i class="mr">&#9654;</i><i class="md">&#9660;</i></div>
+        <div class="mark" aria-hidden="true"><i class="mu">&#9650;</i><i class="ml">&#9664;</i><i class="mr">&#9654;</i><i class="md">&#9660;</i></div>
       </div></div>
       <div class="legend"><b>Controls</b><div class="rows">${legend}</div></div>
       <p class="hint">Arrows / WASD &middot; Z or Space = A &middot; X = B &middot; Enter / P = Pause &middot; R = Reset &middot; Esc = Menu</p>`;
@@ -105,7 +109,7 @@ window.Arcade = (() => {
   }
 
   // Offline support must not depend on entering through the launcher (deep links, installed-app launches).
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js', { updateViaCache: 'none' }).catch(() => {});
 
   return {
     held, mount,
@@ -114,6 +118,15 @@ window.Arcade = (() => {
     on(name, fn) { handlers[name].push(fn); },
     watch(fn) { watchers.push(fn); },
     hi(id) { try { return Number(localStorage.getItem('arcade:hi:' + id)) || 0; } catch (e) { return 0; } },
-    saveHi(id, score) { try { if (score > this.hi(id)) localStorage.setItem('arcade:hi:' + id, String(score)); } catch (e) {} },
+    saveHi(id, score) {
+      const best = score > this.hi(id);
+      try { if (best) localStorage.setItem('arcade:hi:' + id, String(score)); } catch (e) {}
+      this.announce('Final score ' + score + (best ? '. New high score!' : '.'));
+    },
+    // Screen-reader announcement (polite live region). Canvas games otherwise say nothing about their state.
+    announce(msg) {
+      const el = document.getElementById('arcade-live');
+      if (el) { el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 50); }
+    },
   };
 })();

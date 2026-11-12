@@ -5,7 +5,10 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin:0; min-height:100%; background:var(--page); color:var(--ink);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  overscroll-behavior: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  overscroll-behavior: none; touch-action: none; }
+/* Only the play surface and buttons resist selection; the legend and credits stay selectable. */
+.screen, .btn, .top, .ui-toggle { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.sr-only { position:absolute !important; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 body { display:flex; justify-content:center; min-height:100vh; min-height:100dvh; }
 
 .gb { display:grid; gap:6px 8px; padding:10px 12px 12px; width:min(100vw, 480px); align-content:center;
@@ -99,3 +102,20 @@ button { font:inherit; touch-action:none; }
 .legend .row { white-space:nowrap; font-size:13px; }
 .legend kbd { display:inline-block; min-width:26px; padding:1px 7px; margin-right:6px; text-align:center; font:600 12px ui-monospace, monospace;
   color:var(--ink); background:var(--body); border-radius:5px; box-shadow:0 2px 0 var(--body-edge); }
+
+/* Keyboard focus, motion and high-contrast support */
+.top a:focus-visible, .ui-toggle:focus-visible, .btn button:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }
+:root[data-ui=desktop] .top a:focus-visible, :root[data-ui=desktop] .ui-toggle:focus-visible { outline-color:#fff; }
+/* Never leave a focused header control invisible in desktop view. */
+:root[data-ui=desktop] .top:focus-within, :root[data-ui=desktop] .gb:focus-within .legend { opacity:1; pointer-events:auto; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition:none !important; animation:none !important; }
+}
+@media (forced-colors: active) {
+  .screen { border:5px solid CanvasText; }
+  .btn button { border:2px solid ButtonText; background:ButtonFace; }
+  .btn button.on { background:Highlight; }
+  .ui-toggle { border-color:ButtonText; color:ButtonText; }
+  .legend kbd { border:1px solid CanvasText; }
+}
+canvas { image-rendering: pixelated; }

@@ -7,7 +7,7 @@ body { min-height:100vh; min-height:100dvh; }
 main { max-width: 480px; margin: 0 auto; min-height:100vh; min-height:100dvh; padding: 18px 14px 28px;
   background:var(--body); box-shadow: inset 0 0 0 3px var(--body-edge); }
 h1 { margin:6px 0 4px; text-align:center; font-size:1.05rem; letter-spacing:.18em; text-transform:uppercase; white-space:nowrap; }
-h1::before, h1::after { content:"▪▪▪"; font-size:.7em; letter-spacing:.1em; margin:0 .5em; vertical-align:middle; }
+h1::before, h1::after { content:"▪▪▪"; content:"▪▪▪" / ""; font-size:.7em; letter-spacing:.1em; margin:0 .5em; vertical-align:middle; }
 p.sub { text-align:center; margin:0 0 16px; font-size:.85rem; color:#5a4a08; }
 .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .card { display:block; padding:12px 14px; background:var(--lcd); border:5px solid #000; border-radius:4px;
@@ -25,3 +25,15 @@ footer a { color:inherit; display:inline-block; padding:15px 8px; margin:-15px -
   main { max-width: 960px; padding: 24px 28px 36px; }
   .grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+@media (max-width: 340px) { h1 { white-space:normal; } }
+@media (forced-colors: active) { .card { border:5px solid CanvasText; } .card:focus-visible { outline:3px solid Highlight; } }
+
+.pwa { text-align:center; margin-top:18px; }
+.pwa button, #update-toast button { font:inherit; font-weight:700; color:var(--ink); background:var(--lcd); border:3px solid #000; border-radius:6px;
+  padding:12px 18px; min-height:44px; cursor:pointer; box-shadow:0 0 0 2px var(--body), 0 0 0 4px #000; }
+.pwa p { margin:0; font-size:.8rem; color:#5a4a08; }
+#update-toast { position:fixed; left:12px; right:12px; bottom:12px; max-width:420px; margin:0 auto; padding:10px 14px; display:flex; gap:12px;
+  align-items:center; justify-content:space-between; background:var(--ink); color:var(--lcd); border-radius:8px; font-size:.85rem; z-index:10; }
+#update-toast[hidden], .pwa [hidden] { display:none; }
+#update-toast button { padding:8px 14px; min-height:40px; box-shadow:none; border-color:var(--lcd); }

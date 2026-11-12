@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Retro Arcade</title>
 <meta name="description" content="Classic mini-games. Installable, offline, no account.">
@@ -55,6 +56,8 @@ const dirs = { left: K.left, right: K.right, up: K.up, down: K.down };
 function snakeIntro(w) {
   const gm = w.game, cv = w.canvas, c = w.context;
   if (!gm) return;
+  const stop = gm.stop;
+  gm.stop = function () { if (gm.score) Arcade.saveHi('snake', gm.score); return stop.apply(this, arguments); };
   gm.drawMessage = function () {
     if (gm.message === null) return;
     let size = cv.height / 10;
@@ -85,6 +88,7 @@ else {
   const [w, h] = g.ar.split('/').map(Number);
   const { cv, wake } = Arcade.mount({ title: g.title, W: w * 100, H: h * 100, labels: g.labels });
   const frame = document.createElement('iframe');
+  frame.setAttribute('sandbox', 'allow-scripts allow-same-origin'); // vendored code: no popups, forms, modals or top-level navigation
   frame.src = g.src; frame.title = g.title; frame.className = 'lcd-' + g.lcd;
   frame.style.width = g.vw + 'px'; frame.style.height = (g.vw * h / w) + 'px';
   cv.replaceWith(frame);

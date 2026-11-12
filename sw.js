@@ -1,8 +1,8 @@
-const CACHE = 'retro-arcade-v15';
+const CACHE = 'retro-arcade-4f18b795e4';
 // Must all succeed: the launcher, our own games and the licence texts. If one fails the install is retried.
 const CORE = [
   './', './index.html', './style.css', './manifest.webmanifest',
-  './games/common.js', './games/nozoom.js', './games/console.css',
+  './pwa.js', './games/common.js', './games/nozoom.js', './games/console.css',
   './games/breakout.html', './games/shooter.html', './games/blocks.html', './games/rocks.html', './games/play.html',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
   './LICENSE', './THIRD_PARTY.md',
@@ -14,7 +14,7 @@ const CORE = [
   './games/vendor/html5-snake/CREDITS.md', './games/vendor/html5-snake/LICENSE', './games/vendor/html5-snake/UPSTREAM-LICENSE',
 ];
 // Vendored games: cached best-effort, so one flaky asset cannot stop the whole service worker from installing.
-// Anything missed is cached the first time it is fetched (see the fetch handler).
+// Anything missed (or deliberately left out: social cards, app icons, legacy font formats) is cached the first time it is fetched.
 const VENDOR = [
   './games/vendor/asteroids-infinity/index.html',
   './games/vendor/asteroids-infinity/src/app.js',
@@ -33,34 +33,12 @@ const VENDOR = [
   './games/vendor/asteroids-infinity/src/sound.js',
   './games/vendor/asteroids-infinity/src/storage.js',
   './games/vendor/asteroids-infinity/style.css',
-  './games/vendor/hextris/favicon.ico',
   './games/vendor/hextris/images/btn_back.svg',
-  './games/vendor/hextris/images/btn_facebook.svg',
   './games/vendor/hextris/images/btn_help.svg',
   './games/vendor/hextris/images/btn_pause.svg',
   './games/vendor/hextris/images/btn_restart.svg',
   './games/vendor/hextris/images/btn_resume.svg',
-  './games/vendor/hextris/images/btn_share.svg',
-  './games/vendor/hextris/images/btn_twitter.svg',
-  './games/vendor/hextris/images/facebook-opengraph.png',
   './games/vendor/hextris/images/icon_arrows.svg',
-  './games/vendor/hextris/images/icons/apple-touch-120.png',
-  './games/vendor/hextris/images/icons/apple-touch-152.png',
-  './games/vendor/hextris/images/icons/apple-touch-167.png',
-  './games/vendor/hextris/images/icons/apple-touch-180.png',
-  './games/vendor/hextris/images/icons/apple-touch-512.png',
-  './games/vendor/hextris/images/icons/apple-touch.svg',
-  './games/vendor/hextris/images/icons/maskable-192.png',
-  './games/vendor/hextris/images/icons/maskable-192.webp',
-  './games/vendor/hextris/images/icons/maskable-512.png',
-  './games/vendor/hextris/images/icons/maskable-512.webp',
-  './games/vendor/hextris/images/icons/maskable.svg',
-  './games/vendor/hextris/images/icons/transparent-192.png',
-  './games/vendor/hextris/images/icons/transparent-192.webp',
-  './games/vendor/hextris/images/icons/transparent-512.png',
-  './games/vendor/hextris/images/icons/transparent-512.webp',
-  './games/vendor/hextris/images/icons/transparent.svg',
-  './games/vendor/hextris/images/twitter-opengraph.png',
   './games/vendor/hextris/index.html',
   './games/vendor/hextris/js/Block.js',
   './games/vendor/hextris/js/Hex.js',
@@ -77,9 +55,6 @@ const VENDOR = [
   './games/vendor/hextris/js/view.js',
   './games/vendor/hextris/js/wavegen.js',
   './games/vendor/hextris/style/fa/css/font-awesome.min.css',
-  './games/vendor/hextris/style/fa/fonts/fontawesome-webfont.eot',
-  './games/vendor/hextris/style/fa/fonts/fontawesome-webfont.svg',
-  './games/vendor/hextris/style/fa/fonts/fontawesome-webfont.ttf',
   './games/vendor/hextris/style/fa/fonts/fontawesome-webfont.woff',
   './games/vendor/hextris/style/fonts/Exo2-ExtraLight.otf',
   './games/vendor/hextris/style/fonts/Exo2-Regular.otf',

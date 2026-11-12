@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Retro Arcade</title>
   <meta name="description" content="Classic mini-games. Installable, offline, no account.">
@@ -38,24 +39,38 @@
     <a class="card" href="games/blocks.html" data-id="blocks"><h2>Blocks</h2><p>Stack falling blocks and clear lines.</p><span class="hi"></span></a>
     <a class="card" href="games/rocks.html" data-id="rocks"><h2>Space Rocks</h2><p>Blast drifting asteroids before they hit you.</p><span class="hi"></span></a>
     <a class="card" href="games/shooter.html" data-id="shooter"><h2>Side Shooter</h2><p>Shoot down enemies in a side-scrolling level.</p><span class="hi"></span></a>
-    <a class="card" href="games/play.html?g=netris"><h2>Netris</h2><p>Falling blocks. Port of Netris 0.52.</p><span class="hi"></span></a>
-    <a class="card" href="games/play.html?g=hextris"><h2>Hextris</h2><p>Match blocks around a spinning hexagon.</p><span class="hi"></span></a>
-    <a class="card" href="games/play.html?g=asteroids"><h2>Asteroids Infinity</h2><p>Fly, shoot and survive the asteroid field.</p><span class="hi"></span></a>
-    <a class="card" href="games/play.html?g=yanoid"><h2>Yanoid</h2><p>Arkanoid-style brick breaker with power-ups.</p><span class="hi"></span></a>
-    <a class="card" href="games/play.html?g=invaders"><h2>Space Invaders</h2><p>Defend Earth from the descending invaders.</p><span class="hi"></span></a>
-    <a class="card" href="games/play.html?g=snake"><h2>Snake</h2><p>Eat, grow, do not hit yourself.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=netris" data-id="netris"><h2>Netris</h2><p>Falling blocks. Port of Netris 0.52.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=hextris" data-id="hextris"><h2>Hextris</h2><p>Match blocks around a spinning hexagon.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=asteroids" data-id="asteroids"><h2>Asteroids Infinity</h2><p>Fly, shoot and survive the asteroid field.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=yanoid" data-id="yanoid"><h2>Yanoid</h2><p>Arkanoid-style brick breaker with power-ups.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=invaders" data-id="invaders"><h2>Space Invaders</h2><p>Defend Earth from the descending invaders.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=snake" data-id="snake"><h2>Snake</h2><p>Eat, grow, do not hit yourself.</p><span class="hi"></span></a>
+  </div>
+  <div class="pwa">
+    <button id="install-btn" type="button" hidden>Install app</button>
+    <p id="ios-hint" hidden>To install: tap <b>Share</b>, then <b>Add to Home Screen</b>.</p>
   </div>
   <footer>High scores are stored on this device only.<br>GPL-3.0 &middot; <a href="https://github.com/Tomeriko96/retro-arcade/blob/main/THIRD_PARTY.md">game credits</a></footer>
 </main>
+<div id="update-toast" role="status" hidden>A new version is ready. <button id="update-reload" type="button">Reload</button></div>
 <script src="games/nozoom.js"></script>
+<script src="pwa.js" defer></script>
 <script>
 // Cards are static HTML (they work without JS); JS only adds the high scores.
+const num = (k) => { try { return Number(localStorage.getItem(k)) || 0; } catch (e) { return 0; } };
+const json = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+// Where each game keeps its best score. Games without an entry show where the score lives instead of a fake 0.
+const HI = {
+  breakout: () => num('arcade:hi:breakout'), blocks: () => num('arcade:hi:blocks'),
+  rocks: () => num('arcade:hi:rocks'), shooter: () => num('arcade:hi:shooter'), snake: () => num('arcade:hi:snake'),
+  yanoid: () => num('yanoid.highScore'),
+  hextris: () => Math.max(0, ...(json('highscores') || []).map(Number).filter(Number.isFinite)),
+};
+const NOTE = { netris: 'No score, just lines', invaders: 'Score shown in game', asteroids: 'Top 10 kept in game' };
 for (const a of document.querySelectorAll('.card[data-id]')) {
-  let hi = 0;
-  try { hi = Number(localStorage.getItem('arcade:hi:' + a.dataset.id)) || 0; } catch (e) {}
-  a.querySelector('.hi').textContent = 'High score: ' + hi;
+  const id = a.dataset.id;
+  a.querySelector('.hi').textContent = HI[id] ? 'High score: ' + HI[id]() : (NOTE[id] || '');
 }
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>

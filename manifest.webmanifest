@@ -61,5 +61,35 @@
       "name": "Space Invaders",
       "url": "games/play.html?g=invaders"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/home-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Game launcher"
+    },
+    {
+      "src": "screenshots/breakout-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Breakout on desktop"
+    },
+    {
+      "src": "screenshots/home-narrow.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Game launcher on a phone"
+    },
+    {
+      "src": "screenshots/breakout-narrow.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Breakout as a handheld"
+    }
   ]
 }

@@ -31,8 +31,8 @@ Breakout, Blocks, Space Rocks and Side Shooter are written from scratch (vanilla
 ## Adding a game
 
 1. Add `games/<name>.html` (copy an existing game; `Arcade.mount()` from `games/common.js` builds the console, `Arcade.held` and `Arcade.on()` give you the buttons). To embed an existing web game instead, put it in `games/vendor/<name>/` (keeping its license), add it to `GAMES` in `games/play.html` with a key mapping, and list it in `THIRD_PARTY.md`.
-2. Add the game to `GAMES` in `index.html`.
-3. Add the file to `ASSETS` in `sw.js` and bump `CACHE` (e.g. `retro-arcade-v12`), otherwise existing installs will not receive the update.
+2. Add a card to the grid in `index.html` (plain HTML, so the launcher works without JS). Add `data-id` and a reader in the `HI` map if the game keeps a high score.
+3. Add the files to `CORE` (own games) or `VENDOR` (third-party, cached best-effort) in `sw.js`, then run `node tools/sw-cache.mjs --write`. It checks that every listed file exists and sets `CACHE` to a hash of their contents, so existing installs receive the update. CI (`.github/workflows/check-sw.yml`) fails if you forget.
 
 ## Running locally
 
@@ -40,7 +40,7 @@ Breakout, Blocks, Space Rocks and Side Shooter are written from scratch (vanilla
 python3 -m http.server 8000
 ```
 
-Service workers work on `localhost`, so installing and offline testing work this way too.
+Service workers work on `localhost`, so installing and offline testing work this way too. After editing any precached file, run `node tools/sw-cache.mjs --write` before committing.
 
 ## License
 

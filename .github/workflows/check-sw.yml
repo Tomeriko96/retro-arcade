@@ -1,0 +1,15 @@
+name: Check service worker
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  sw-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Fails if sw.js lists a missing file, or the cache name is stale after editing a precached file.
+      - run: node tools/sw-cache.mjs
