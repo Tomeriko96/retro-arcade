@@ -1,4 +1,4 @@
-const CACHE = 'retro-arcade-4f18b795e4';
+const CACHE = 'retro-arcade-5e46e81363';
 // Must all succeed: the launcher, our own games and the licence texts. If one fails the install is retried.
 const CORE = [
   './', './index.html', './style.css', './manifest.webmanifest',
@@ -13,7 +13,7 @@ const CORE = [
   './games/vendor/html5-space-invaders/CREDITS.md', './games/vendor/html5-space-invaders/LICENSE', './games/vendor/html5-space-invaders/UPSTREAM-LICENSE',
   './games/vendor/html5-snake/CREDITS.md', './games/vendor/html5-snake/LICENSE', './games/vendor/html5-snake/UPSTREAM-LICENSE',
 ];
-// Vendored games: cached best-effort, so one flaky asset cannot stop the whole service worker from installing.
+// Vendored games: cached best-effort after activation (message 'warm'), so they never gate or break the install.
 // Anything missed (or deliberately left out: social cards, app icons, legacy font formats) is cached the first time it is fetched.
 const VENDOR = [
   './games/vendor/asteroids-infinity/index.html',
@@ -124,10 +124,15 @@ const VENDOR = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then(async (c) => {
-    await c.addAll(CORE);
-    await Promise.allSettled(VENDOR.map((u) => c.add(u)));
-  }).then(() => self.skipWaiting()));
+  // Activate as soon as the shell is cached; the ~1.5 MB of vendored games must not delay first-visit offline support.
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
+});
+
+// Pages ask for the vendored games to be cached once they are idle (see warmCache() in pwa.js / games/common.js).
+// Best-effort: one failed file never matters, and anything missed is cached when it is first played.
+self.addEventListener('message', (e) => {
+  if (e.data !== 'warm') return;
+  e.waitUntil(caches.open(CACHE).then((c) => Promise.allSettled(VENDOR.map((u) => c.match(u).then((hit) => hit || c.add(u))))));
 });
 
 self.addEventListener('activate', (e) => {

@@ -109,7 +109,11 @@ window.Arcade = (() => {
   }
 
   // Offline support must not depend on entering through the launcher (deep links, installed-app launches).
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js', { updateViaCache: 'none' }).catch(() => {});
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js', { updateViaCache: 'none' }).catch(() => {});
+    // Once the worker is active and the page idle, ask it to cache the vendored games too.
+    navigator.serviceWorker.ready.then((reg) => (window.requestIdleCallback || ((f) => setTimeout(f, 2000)))(() => reg.active && reg.active.postMessage('warm'))).catch(() => {});
+  }
 
   return {
     held, mount,

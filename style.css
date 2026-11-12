@@ -16,7 +16,7 @@ p.sub { text-align:center; margin:0 0 16px; font-size:.85rem; color:#5a4a08; }
 .card:active p, .card:focus-visible p, .card:active .hi, .card:focus-visible .hi { color:var(--lcd); }
 .card h2 { margin:0 0 4px; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; }
 .card p { margin:0 0 8px; color:var(--mid); font-size:.8rem; min-height:2.4em; }
-.card .hi { color:var(--ink); font-size:.75rem; font-weight:700; }
+.card .hi { display:block; min-height:1.3em; color:var(--ink); font-size:.75rem; font-weight:700; }
 footer { margin-top:22px; text-align:center; color:#5a4a08; font-size:.75rem; }
 footer a { color:inherit; display:inline-block; padding:15px 8px; margin:-15px -8px; }
 
@@ -37,3 +37,4 @@ footer a { color:inherit; display:inline-block; padding:15px 8px; margin:-15px -
   align-items:center; justify-content:space-between; background:var(--ink); color:var(--lcd); border-radius:8px; font-size:.85rem; z-index:10; }
 #update-toast[hidden], .pwa [hidden] { display:none; }
 #update-toast button { padding:8px 14px; min-height:40px; box-shadow:none; border-color:var(--lcd); }
+html { touch-action: manipulation; } /* no double-tap delay; pinch-zoom stays available on the launcher */

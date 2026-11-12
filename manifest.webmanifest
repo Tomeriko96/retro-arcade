@@ -39,27 +39,69 @@
   "shortcuts": [
     {
       "name": "Breakout",
-      "url": "games/breakout.html"
+      "url": "games/breakout.html",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Blocks",
-      "url": "games/blocks.html"
+      "url": "games/blocks.html",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Space Rocks",
-      "url": "games/rocks.html"
+      "url": "games/rocks.html",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Side Shooter",
-      "url": "games/shooter.html"
+      "url": "games/shooter.html",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Snake",
-      "url": "games/play.html?g=snake"
+      "url": "games/play.html?g=snake",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Space Invaders",
-      "url": "games/play.html?g=invaders"
+      "url": "games/play.html?g=invaders",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "screenshots": [

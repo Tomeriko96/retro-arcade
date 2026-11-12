@@ -24,7 +24,13 @@
 
   if (!('serviceWorker' in navigator)) return;
   const showUpdate = () => { if (toast) toast.hidden = false; };
+  function warmCache(reg) {
+    // Fetch the vendored games in the background once the page is idle.
+    const go = () => reg.active && reg.active.postMessage('warm');
+    (window.requestIdleCallback || ((f) => setTimeout(f, 2000)))(go);
+  }
   navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+    navigator.serviceWorker.ready.then(warmCache);
     if (reg.waiting && navigator.serviceWorker.controller) showUpdate();
     reg.addEventListener('updatefound', () => {
       const w = reg.installing;

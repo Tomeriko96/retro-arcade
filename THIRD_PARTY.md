@@ -19,8 +19,16 @@ folder (`LICENSE`, `CREDITS.md`, `LICENSE.md`, `UPSTREAM-*`).
 
 - Copied only each game's `public/` folder (the runnable game), plus its license and notice files.
 - Removed the GoatCounter analytics `<script>` tag from every `index.html`, so no game phones home.
-- Nothing else in the game code is modified. They run unchanged inside an iframe (`games/play.html`),
-  which sends key events to them from the on-screen console buttons.
+- Hextris (`js/initialization.js`): the saved game is now written on `pagehide`/`visibilitychange` instead of
+  `unload`, which Chromium blocks, so the save never happened.
+- Netris (`index.html`): the footer link to a missing `SOFTWARE_ARCHAEOLOGY.md` now points to the shipped
+  `UPSTREAM-PROVENANCE.md`.
+- Nothing else in the game code is modified. They run inside a sandboxed iframe (`games/play.html`), which sends
+  key events to them from the on-screen console buttons. `play.html` also injects a small stylesheet per game to
+  hide vendor menus that duplicate the console, and repaints Snake's start screen; those are integration code in
+  this repository, not edits to the vendored files.
+
+**Rule:** every edit to a file under `games/vendor/` must add a line to this list.
 
 ## Licensing of this repository
 

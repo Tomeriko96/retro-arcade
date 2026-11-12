@@ -1,0 +1,6 @@
+# Vendored third-party games are not our code; keep them out of language stats.
+games/vendor/** linguist-vendored
+*.png binary
+*.ico binary
+*.otf binary
+*.woff binary
