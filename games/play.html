@@ -11,6 +11,8 @@
   /* Same LCD look as our own games: grayscale the page, then multiply it onto the green screen. Dark pages are inverted first. */
   .screen iframe.lcd-light  { filter: grayscale(1) contrast(1.35); }
   .screen iframe.lcd-invert { filter: grayscale(1) contrast(1.35) invert(1); }
+  /* Games whose colors matter keep their own look. */
+  .screen iframe.lcd-none   { mix-blend-mode:normal; background:#fff; }
 </style>
 </head>
 <body>
@@ -34,9 +36,9 @@ const K = {
 const dirs = { left: K.left, right: K.right, up: K.up, down: K.down };
 const GAMES = {
   netris:   { title: 'Netris',            lcd: 'invert', src: 'vendor/netris/index.html',             ar: '3 / 5', vw: 480, labels: { up: 'Rotation', a: 'Rotate', b: 'Drop' }, keys: { ...dirs, a: K.up, b: K.p, start: K.s } },
-  hextris:  { title: 'Hextris',           lcd: 'light', src: 'vendor/hextris/index.html',            ar: '3 / 4', vw: 480, labels: { up: null, left: 'Rotate', right: 'Rotate', a: 'Start', b: 'Pause' }, keys: { ...dirs, a: K.enter, b: K.space, start: K.enter } },
+  hextris:  { title: 'Hextris',           lcd: 'none', src: 'vendor/hextris/index.html',            ar: '3 / 4', vw: 480, labels: { up: null, left: 'Rotate', right: 'Rotate', a: 'Start', b: 'Pause' }, keys: { ...dirs, a: K.enter, b: K.space, start: K.enter } },
   asteroids:{ title: 'Asteroids Infinity',lcd: 'invert', src: 'vendor/asteroids-infinity/index.html', ar: '4 / 5', vw: 520, labels: { up: 'Thrust', down: 'Brake', a: 'Fire', b: 'Shield' }, keys: { ...dirs, a: K.space, b: K.ctrl, start: K.enter } },
-  yanoid:   { title: 'Yanoid',            lcd: 'invert', src: 'vendor/yanoid/index.html',             ar: '3 / 4', vw: 520, labels: { up: null, down: null, a: 'Fire', b: 'Pause' }, keys: { left: K.left, right: K.right, a: K.space, b: K.esc, start: { click: '#startBtn' } } },
+  yanoid:   { title: 'Yanoid',            lcd: 'none', src: 'vendor/yanoid/index.html',             ar: '3 / 4', vw: 520, labels: { up: null, down: null, a: 'Fire', b: 'Pause' }, keys: { left: K.left, right: K.right, a: K.space, b: K.esc, start: { click: '#startBtn' } } },
   invaders: { title: 'Space Invaders',    lcd: 'invert', src: 'vendor/html5-space-invaders/index.html', ar: '4 / 5', vw: 640, labels: { up: null, down: null, a: 'Fire', b: 'Enter' }, keys: { left: K.left, right: K.right, a: K.space, b: K.enter, start: K.one } },
   snake:    { title: 'Snake',             lcd: 'light', src: 'vendor/html5-snake/index.html',        ar: '5 / 2', vw: 720, labels: { a: 'Start', b: null }, keys: { ...dirs, a: K.enter, b: K.enter, start: K.enter } },
 };
@@ -53,7 +55,11 @@ else {
   frame.style.touchAction = 'manipulation';
   frame.addEventListener('load', () => window.noZoom(frame.contentWindow, false));
   const box = frame.parentElement;
-  const fit = () => { frame.style.transform = 'scale(' + (box.clientWidth / g.vw) + ')'; };
+  const fit = () => {
+    const s = box.clientWidth / g.vw; // game is laid out g.vw wide, then scaled; height follows the screen so no strip is left over
+    frame.style.transform = 'scale(' + s + ')';
+    frame.style.height = (box.clientHeight / s) + 'px';
+  };
   new ResizeObserver(fit).observe(box); fit();
 
   function send(type, spec) {
