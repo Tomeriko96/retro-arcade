@@ -80,10 +80,11 @@ button { font:inherit; touch-action:none; }
    show for a moment when the mouse moves, then fade away (and the cursor hides while idle). */
 :root[data-ui=desktop], :root[data-ui=desktop] body { background:var(--lcd); }
 :root[data-ui=desktop] body { min-height:100vh; min-height:100dvh; overflow:hidden; }
-:root[data-ui=desktop] .gb { position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; padding:0; gap:0; display:flex;
+:root[data-ui=desktop] .gb { position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; padding:44px 0 66px; box-sizing:border-box; gap:0; display:flex;
   align-items:center; justify-content:center; background:transparent; box-shadow:none; border-radius:0; }
 :root[data-ui=desktop] .left, :root[data-ui=desktop] .right, :root[data-ui=desktop] .hint { display:none; }
-:root[data-ui=desktop] .screen { width:min(100vw, calc(100vh * var(--ar))); width:min(100vw, calc(100dvh * var(--ar)));
+/* The screen sits between the header (44px) and key list (66px) so neither ever covers the game or its HUD. */
+:root[data-ui=desktop] .screen { width:min(100vw, calc((100vh - 110px) * var(--ar))); width:min(100vw, calc((100dvh - 110px) * var(--ar)));
   margin:0; border:0; border-radius:0; box-shadow:none; }
 :root[data-ui=desktop] .top, :root[data-ui=desktop] .legend { position:fixed; left:0; right:0; z-index:5; display:flex;
   background:rgba(27,34,16,.88); color:#fff; padding:10px 18px; opacity:0; pointer-events:none; transition:opacity .3s; }

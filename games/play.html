@@ -50,14 +50,34 @@ const K = {
   one:   { key: '1',          code: 'Digit1',     kc: 49 },
 };
 const dirs = { left: K.left, right: K.right, up: K.up, down: K.down };
+// Upstream Snake never calls start(), so its first frame collides at an uninitialised position and shows GAME OVER before
+// anyone has played. Repaint a proper start screen, and shrink messages to fit (the Impact font is missing on many systems).
+function snakeIntro(w) {
+  const gm = w.game, cv = w.canvas, c = w.context;
+  if (!gm) return;
+  gm.drawMessage = function () {
+    if (gm.message === null) return;
+    let size = cv.height / 10;
+    c.font = size + 'px Impact'; c.textAlign = 'center';
+    const wide = c.measureText(gm.message).width;
+    if (wide > cv.width * 0.9) { size *= cv.width * 0.9 / wide; c.font = size + 'px Impact'; }
+    c.fillStyle = '#00F'; c.strokeStyle = '#FFF';
+    c.fillText(gm.message, cv.width / 2, cv.height / 2); c.strokeText(gm.message, cv.width / 2, cv.height / 2);
+  };
+  // Nothing has been started yet, whatever the game believes (it may not have run its first frame yet).
+  gm.over = true; gm.message = 'PRESS SPACEBAR TO START'; gm.resetCanvas(); gm.drawMessage();
+}
 const GAMES = {
-  netris:   { title: 'Netris',            lcd: 'invert', src: 'vendor/netris/index.html',             ar: '3 / 5', vw: 480, labels: { up: 'Rotation', a: 'Rotate', b: 'Drop' }, keys: { ...dirs, a: K.up, b: K.p, start: K.s } },
+  netris:   { title: 'Netris',            lcd: 'invert', src: 'vendor/netris/index.html',             ar: '3 / 5', vw: 480, css: 'footer,.topbar h1{display:none!important}', labels: { up: 'Rotation', a: 'Rotate', b: 'Drop' }, keys: { ...dirs, a: K.up, b: K.p, start: K.s } },
   hextris:  { title: 'Hextris',           lcd: 'none', src: 'vendor/hextris/index.html',            ar: '3 / 4', vw: 480, labels: { up: null, left: 'Rotate', right: 'Rotate', a: 'Start', b: 'Pause' }, keys: { ...dirs, a: K.enter, b: K.space, start: K.enter } },
-  asteroids:{ title: 'Asteroids Infinity',lcd: 'invert', src: 'vendor/asteroids-infinity/index.html', ar: '4 / 5', vw: 520, labels: { up: 'Thrust', down: 'Brake', a: 'Fire', b: 'Shield' }, keys: { ...dirs, a: K.space, b: K.ctrl, start: K.enter } },
-  yanoid:   { title: 'Yanoid',            lcd: 'none', src: 'vendor/yanoid/index.html',             ar: '3 / 4', vw: 520, labels: { up: null, down: null, a: 'Fire', b: 'Pause' }, keys: { left: K.left, right: K.right, a: K.space, b: K.esc, start: { click: '#startBtn' } } },
+  asteroids:{ title: 'Asteroids Infinity',lcd: 'invert', src: 'vendor/asteroids-infinity/index.html', ar: '4 / 3', vw: 640, css: 'header,footer{display:none!important}', labels: { up: 'Thrust', down: 'Brake', a: 'Fire', b: 'Shield' }, keys: { ...dirs, a: K.space, b: K.ctrl, start: K.enter } },
+  yanoid:   { title: 'Yanoid',            lcd: 'none', src: 'vendor/yanoid/index.html',             ar: '3 / 4', vw: 520, css: '.logo,#pauseBtn,#helpBtn,#aboutBtn,.touch-controls,.footer-controls{display:none!important}', labels: { up: null, down: null, a: 'Fire', b: 'Pause' }, keys: { left: K.left, right: K.right, a: K.space, b: K.esc, start: { click: '#startBtn' } } },
   invaders: { title: 'Space Invaders',    lcd: 'invert', src: 'vendor/html5-space-invaders/index.html', ar: '4 / 5', vw: 640, labels: { up: null, down: null, a: 'Fire', b: 'Enter' }, keys: { left: K.left, right: K.right, a: K.space, b: K.enter, start: K.one } },
-  snake:    { title: 'Snake',             lcd: 'light', src: 'vendor/html5-snake/index.html',        ar: '5 / 2', vw: 720, labels: { a: 'Start', b: null }, keys: { ...dirs, a: K.enter, b: K.enter, start: K.enter } },
+  snake:    { title: 'Snake',             lcd: 'light', src: 'vendor/html5-snake/index.html',        ar: '4 / 3', vw: 820, init: snakeIntro, labels: { a: 'Start', b: null }, keys: { ...dirs, a: K.enter, b: K.enter, start: K.enter } },
 };
+// Per game: `css` hides vendor chrome that duplicates the console (same-origin injection keeps the vendored files untouched);
+// `init` runs once the game has loaded. Snake's size.js sizes its canvas from the iframe viewport (80%, in 4:3 grid steps),
+// so a ~820px wide 4:3 box yields exactly its native 640x480 canvas (800x600 is the minimum; the extra covers the screen border).
 const id = new URLSearchParams(location.search).get('g');
 const g = GAMES[id];
 if (!g) { location.replace('../'); }
@@ -69,7 +89,13 @@ else {
   frame.style.width = g.vw + 'px'; frame.style.height = (g.vw * h / w) + 'px';
   cv.replaceWith(frame);
   frame.style.touchAction = 'manipulation';
-  frame.addEventListener('load', () => { window.noZoom(frame.contentWindow, false); window.focus(); try {
+  frame.addEventListener('load', () => {
+    window.noZoom(frame.contentWindow, false); window.focus();
+    try {
+      const d = frame.contentDocument;
+      if (g.css) { const st = d.createElement('style'); st.textContent = g.css; d.head.appendChild(st); }
+      if (g.init) g.init(frame.contentWindow);
+    } catch (e) { /* cross-origin: leave the vendor page as is */ } try {
       frame.contentWindow.addEventListener('mousemove', wake);
       // Clicking inside the game would leave keyboard focus in the iframe and silently kill Esc/R/P and the
       // console key mapping. Hand focus back to the console after every click; the console forwards keys itself.
