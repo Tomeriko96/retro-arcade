@@ -1,4 +1,4 @@
-const CACHE = 'retro-arcade-v1';
+const CACHE = 'retro-arcade-v2';
 const ASSETS = [
   './', './index.html', './style.css', './manifest.webmanifest',
   './games/common.js', './games/breakout.html', './games/shooter.html',
@@ -17,7 +17,7 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache first, netwerk als fallback (en bijwerken voor de volgende keer).
+// Cache first, network as fallback (and store the response for next time).
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(

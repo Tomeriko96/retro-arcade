@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
@@ -58,7 +58,7 @@ function update(dt) {
   if (ball.x < ball.r) { ball.x = ball.r; ball.vx = Math.abs(ball.vx); }
   if (ball.x > W - ball.r) { ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx); }
   if (ball.y < ball.r) { ball.y = ball.r; ball.vy = Math.abs(ball.vy); }
-  // Batje: hoek hangt af van waar de bal landt.
+  // Paddle: bounce angle depends on where the ball lands.
   if (ball.vy > 0 && ball.y + ball.r >= paddle.y && ball.y - ball.r <= paddle.y + paddle.h &&
       Math.abs(ball.x - paddle.x) <= paddle.w / 2 + ball.r) {
     const t = (ball.x - paddle.x) / (paddle.w / 2);
@@ -96,9 +96,9 @@ function draw() {
   text('SCORE ' + score, 10, 30, 16, '#39ff88', 'left');
   text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 30, 16, '#8f8fb8');
   text('♥'.repeat(lives), W - 10, 30, 16, '#ff4081', 'right');
-  if (state === 'ready') text('Tik om te starten', W / 2, H / 2 + 60, 18, '#fff');
-  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Tik voor opnieuw', W / 2, H / 2 + 30, 16, '#fff'); }
-  if (state === 'won') { text('GEWONNEN!', W / 2, H / 2, 28, '#39ff88'); text('Tik voor opnieuw', W / 2, H / 2 + 30, 16, '#fff'); }
+  if (state === 'ready') text('Tap to start', W / 2, H / 2 + 60, 18, '#fff');
+  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Tap to play again', W / 2, H / 2 + 30, 16, '#fff'); }
+  if (state === 'won') { text('YOU WIN!', W / 2, H / 2, 28, '#39ff88'); text('Tap to play again', W / 2, H / 2 + 30, 16, '#fff'); }
 }
 
 let last = performance.now();

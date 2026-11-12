@@ -1,32 +1,32 @@
 # Retro Arcade
 
-Kleine klassieke games als installeerbare, offline speelbare PWA. Eén gedeelde shell (manifest, service worker, launcher), losse games ernaast. Geen frameworks, geen build, geen backend.
+Small classic games as an installable, offline-capable PWA. One shared shell (manifest, service worker, launcher) with separate games next to it. No frameworks, no build step, no backend.
 
-**Spelen:** https://tomeriko96.github.io/retro-arcade/
+**Play:** https://tomeriko96.github.io/retro-arcade/
 
 ## Games
 
-| Game | Bediening |
+| Game | Controls |
 | --- | --- |
-| Breakout | sleep het batje, tik om te lanceren |
-| Side Shooter | sleep het schip, het schiet automatisch |
+| Breakout | drag the paddle, tap to launch |
+| Side Shooter | drag the ship, it fires automatically |
 
-Alle games zijn zelf geschreven (vanilla JS + Canvas), zodat er geen onduidelijke code- of assetlicenties meekomen. Highscores worden per game in `localStorage` bewaard.
+All games are written from scratch (vanilla JS + Canvas), so no unclear code or asset licenses come along. High scores are stored per game in `localStorage`.
 
-## Een game toevoegen
+## Adding a game
 
-1. Zet `games/<naam>.html` neer (gebruik `games/common.js` voor schaling en highscore).
-2. Voeg de game toe aan `GAMES` in `index.html`.
-3. Voeg het bestand toe aan `ASSETS` in `sw.js` en verhoog `CACHE` (bijv. `retro-arcade-v2`), anders krijgen bestaande installaties de update niet.
+1. Add `games/<name>.html` (use `games/common.js` for scaling and high scores).
+2. Add the game to `GAMES` in `index.html`.
+3. Add the file to `ASSETS` in `sw.js` and bump `CACHE` (e.g. `retro-arcade-v3`), otherwise existing installs will not receive the update.
 
-## Lokaal draaien
+## Running locally
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Service workers werken op `localhost`, dus installeren en offline testen kan zo ook.
+Service workers work on `localhost`, so installing and offline testing work this way too.
 
-## Licentie
+## License
 
-MIT, zie `LICENSE`.
+MIT, see `LICENSE`.

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
@@ -16,7 +16,7 @@
 <canvas id="c"></canvas>
 <script src="common.js"></script>
 <script>
-// Vingerbesturing: sleep om je schip te verplaatsen, het schip schiet automatisch.
+// Touch controls: drag to move your ship, it fires automatically.
 const W = 540, H = 320, ID = 'shooter';
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 Arcade.fit(cv, W, H);
@@ -97,8 +97,8 @@ function draw() {
   text('SCORE ' + score, 10, 22, 14, '#39ff88', 'left');
   text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 22, 14, '#8f8fb8');
   text('♥'.repeat(Math.max(0, lives)), W - 10, 22, 14, '#ff4081', 'right');
-  if (state === 'ready') { text('Sleep om te sturen, schip schiet automatisch', W / 2, H / 2, 15, '#fff'); text('Tik om te starten', W / 2, H / 2 + 24, 15, '#39ff88'); }
-  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Tik voor opnieuw', W / 2, H / 2 + 28, 15, '#fff'); }
+  if (state === 'ready') { text('Drag to steer, your ship fires automatically', W / 2, H / 2, 15, '#fff'); text('Tap to start', W / 2, H / 2 + 24, 15, '#39ff88'); }
+  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Tap to play again', W / 2, H / 2 + 28, 15, '#fff'); }
 }
 
 let last = performance.now();
