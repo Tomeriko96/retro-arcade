@@ -8,6 +8,7 @@
 <meta name="description" content="Stack falling blocks and clear lines. Free, offline, no account.">
 <meta name="theme-color" content="#f2cb1c">
 <meta name="application-name" content="Retro Arcade">
+<meta name="apple-mobile-web-app-title" content="Retro Arcade">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
@@ -37,7 +38,7 @@ const COLS = 10, ROWS = 20, C = 16, BX = 4;
 const W = 240, H = ROWS * C, ID = 'blocks';
 const { ctx } = Arcade.mount({ title: 'Blocks', W, H, labels: { up: 'Rotation', a: 'Rotate', b: 'Drop' } });
 const held = Arcade.held;
-const INK = Arcade.ink, MID = Arcade.mid, LCD = Arcade.lcd;
+const INK = Arcade.ink, MID = Arcade.mid, LABEL = Arcade.label, LCD = Arcade.lcd;
 
 const SHAPES = {
   I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
@@ -142,13 +143,13 @@ function draw() {
     cur.m.forEach((row, y) => row.forEach((v, x) => { if (v && cur.y + y >= 0) cell(BX + (cur.x + x) * C, (cur.y + y) * C); }));
   }
   const px = BX + COLS * C + 14;
-  text('NEXT', px, 20, 11, MID, 'left');
+  text('NEXT', px, 20, 11, LABEL, 'left');
   const nm = SHAPES[next];
   nm.forEach((row, y) => row.forEach((v, x) => { if (v) cell(px + x * 12, 28 + y * 12, 12); }));
-  text('SCORE', px, 110, 11, MID, 'left'); text(String(score), px, 126, 14, INK, 'left');
-  text('LEVEL', px, 154, 11, MID, 'left'); text(String(level), px, 170, 14, INK, 'left');
-  text('LINES', px, 198, 11, MID, 'left'); text(String(lines), px, 214, 14, INK, 'left');
-  text('HI', px, 242, 11, MID, 'left'); text(String(Math.max(Arcade.hi(ID), score)), px, 258, 14, INK, 'left');
+  text('SCORE', px, 110, 11, LABEL, 'left'); text(String(score), px, 126, 14, INK, 'left');
+  text('LEVEL', px, 154, 11, LABEL, 'left'); text(String(level), px, 170, 14, INK, 'left');
+  text('LINES', px, 198, 11, LABEL, 'left'); text(String(lines), px, 214, 14, INK, 'left');
+  text('HI', px, 242, 11, LABEL, 'left'); text(String(Math.max(Arcade.hi(ID), score)), px, 258, 14, INK, 'left');
   if (state === 'ready') { ctx.fillStyle = 'rgba(158,173,134,.92)'; ctx.fillRect(BX, 120, COLS * C, 70); text('Press A', BX + COLS * C / 2, 150, 16, INK); text('to start', BX + COLS * C / 2, 172, 16, INK); }
   if (state === 'paused') { ctx.fillStyle = 'rgba(158,173,134,.92)'; ctx.fillRect(BX, 130, COLS * C, 50); text('PAUSED', BX + COLS * C / 2, 162, 18, INK); }
   if (state === 'over') { ctx.fillStyle = 'rgba(158,173,134,.92)'; ctx.fillRect(BX, 110, COLS * C, 90); text('GAME OVER', BX + COLS * C / 2, 150, 16, INK); text('Press A', BX + COLS * C / 2, 176, 14, INK); }

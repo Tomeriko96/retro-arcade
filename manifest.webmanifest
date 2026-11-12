@@ -102,6 +102,50 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "Netris",
+      "url": "games/play.html?g=netris",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Hextris",
+      "url": "games/play.html?g=hextris",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Asteroids Infinity",
+      "url": "games/play.html?g=asteroids",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Yanoid",
+      "url": "games/play.html?g=yanoid",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "screenshots": [

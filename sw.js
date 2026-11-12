@@ -1,4 +1,4 @@
-const CACHE = 'retro-arcade-76d480ad91';
+const CACHE = 'retro-arcade-184fcda368';
 // Must all succeed: the launcher, our own games and the licence texts. If one fails the install is retried.
 const CORE = [
   './', './index.html', './style.css', './manifest.webmanifest',

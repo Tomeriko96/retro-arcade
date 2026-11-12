@@ -1,6 +1,6 @@
 /* Brick-game handheld: yellow body, black bezel, round blue buttons in a diamond (left/right/rotate/down),
    big blue action button, small green/red buttons. Laid out after chvin/react-tetris' controls. */
-:root { --page:#009688; --body:#f2cb1c; --body-edge:#c9a21a; --ink:#1a1a1a; --blue:#5b66f2; --blue-dk:#3b44c4;
+:root { --page:#009688; --body:#f2cb1c; --body-edge:#c9a21a; --blue:#5b66f2; --blue-dk:#3b44c4;
   --green:#2fc12f; --red:#e0141c; --lcd:#9ead86; --ink:#1b2210; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin:0; min-height:100%; background:var(--page); color:var(--ink);
@@ -32,12 +32,13 @@ button { font:inherit; touch-action:none; }
 .btn button { border:0; border-radius:50%; cursor:pointer; box-shadow: 0 3px 5px rgba(0,0,0,.45), inset 0 -3px 5px rgba(0,0,0,.25);
   background: radial-gradient(circle at 35% 30%, #8f98ff, var(--blue) 55%, var(--blue-dk)); }
 .btn button.on { transform: translateY(2px) scale(.96); box-shadow: 0 1px 2px rgba(0,0,0,.5), inset 0 3px 6px rgba(0,0,0,.35); filter: brightness(.9); }
-.btn label { font-size:12px; font-weight:600; margin-top:3px; white-space:nowrap; text-align:center; }
+.btn .cap { font-size:12px; font-weight:600; margin-top:3px; white-space:nowrap; text-align:center; }
 
 /* left: small pause/menu/reset row, big action buttons below */
 .left { grid-area:left; display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
-.small { display:flex; gap:6px; } .small .btn label { font-size:11px; }
-.small button { width:30px; height:30px; }
+.small { display:flex; gap:6px; } .small .btn .cap { font-size:11px; }
+.small button { width:30px; height:30px; position:relative; }
+.small button::after { content:""; position:absolute; inset:-7px; } /* 44px hit area, 30px artwork */
 .small .green button { background: radial-gradient(circle at 35% 30%, #7de07d, var(--green) 55%, #1c8a1c); }
 .small .red button { background: radial-gradient(circle at 35% 30%, #ff6b6f, var(--red) 55%, #9a0a10); }
 .big { display:flex; align-items:flex-end; gap:6px; }
@@ -51,8 +52,8 @@ button { font:inherit; touch-action:none; }
 .diamond .btn button { width:48px; height:48px; }
 .diamond .u { grid-column:2; grid-row:1; } .diamond .l { grid-column:1; grid-row:2; }
 .diamond .r { grid-column:3; grid-row:2; } .diamond .d { grid-column:2; grid-row:3; }
-.diamond .btn label { position:absolute; top:100%; left:50%; transform:translateX(-50%); margin:0; }
-.diamond .u label { top:8px; left:auto; right:calc(100% + 4px); transform:none; text-align:right; }
+.diamond .btn .cap { position:absolute; top:100%; left:50%; transform:translateX(-50%); margin:0; }
+.diamond .u .cap { top:8px; left:auto; right:calc(100% + 4px); transform:none; text-align:right; }
 .diamond .mark { grid-column:2; grid-row:2; display:grid; place-items:center; font-size:12px; line-height:1;
   grid-template-areas:". u ." "l . r" ". d ."; }
 .mark i { font-style:normal; } .mark .mu{grid-area:u} .mark .ml{grid-area:l} .mark .mr{grid-area:r} .mark .md{grid-area:d}
@@ -83,11 +84,12 @@ button { font:inherit; touch-action:none; }
    show for a moment when the mouse moves, then fade away (and the cursor hides while idle). */
 :root[data-ui=desktop], :root[data-ui=desktop] body { background:var(--lcd); }
 :root[data-ui=desktop] body { min-height:100vh; min-height:100dvh; overflow:hidden; }
-:root[data-ui=desktop] .gb { position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; padding:44px 0 66px; box-sizing:border-box; gap:0; display:flex;
+:root[data-ui=desktop] .gb { position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; padding:var(--bar-top,44px) 0 var(--bar-bottom,66px); box-sizing:border-box; gap:0; display:flex;
   align-items:center; justify-content:center; background:transparent; box-shadow:none; border-radius:0; }
 :root[data-ui=desktop] .left, :root[data-ui=desktop] .right, :root[data-ui=desktop] .hint { display:none; }
-/* The screen sits between the header (44px) and key list (66px) so neither ever covers the game or its HUD. */
-:root[data-ui=desktop] .screen { width:min(100vw, calc((100vh - 110px) * var(--ar))); width:min(100vw, calc((100dvh - 110px) * var(--ar)));
+/* The screen sits between the header and the key list so neither ever covers the game or its HUD. Their real heights
+   (the key list wraps on narrow windows) are measured in common.js into --bar-top / --bar-bottom. */
+:root[data-ui=desktop] .screen { height:auto; width:min(100vw, calc((100vh - var(--bar-top,44px) - var(--bar-bottom,66px)) * var(--ar))); width:min(100vw, calc((100dvh - var(--bar-top,44px) - var(--bar-bottom,66px)) * var(--ar)));
   margin:0; border:0; border-radius:0; box-shadow:none; }
 :root[data-ui=desktop] .top, :root[data-ui=desktop] .legend { position:fixed; left:0; right:0; z-index:5; display:flex;
   background:rgba(27,34,16,.88); color:#fff; padding:10px 18px; opacity:0; pointer-events:none; transition:opacity .3s; }
@@ -118,3 +120,8 @@ button { font:inherit; touch-action:none; }
   .ui-toggle { border-color:ButtonText; color:ButtonText; }
   .legend kbd { border:1px solid CanvasText; }
 }
+
+/* Brief message, e.g. the Reset confirmation */
+.toast { position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); z-index:20; max-width:90vw;
+  padding:8px 14px; border-radius:8px; background:var(--ink); color:var(--lcd); font-size:13px; font-weight:600; opacity:0; pointer-events:none; transition:opacity .15s; }
+.toast.show { opacity:1; }

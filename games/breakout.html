@@ -8,6 +8,7 @@
 <meta name="description" content="Bounce the ball, break the bricks. Free, offline, no account.">
 <meta name="theme-color" content="#f2cb1c">
 <meta name="application-name" content="Retro Arcade">
+<meta name="apple-mobile-web-app-title" content="Retro Arcade">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
@@ -35,7 +36,7 @@
 const W = 360, H = 540, ID = 'breakout';
 const { ctx } = Arcade.mount({ title: 'Breakout', W, H, labels: { up: null, down: null, a: 'Launch', b: null } });
 const held = Arcade.held;
-const INK = Arcade.ink, MID = Arcade.mid, LCD = Arcade.lcd;
+const INK = Arcade.ink, MID = Arcade.mid, LABEL = Arcade.label, LCD = Arcade.lcd;
 
 const COLS = 8, ROWS = 6, BW = W / COLS, BH = 20, TOP = 50;
 const COLORS = [INK, MID, INK, MID, INK, MID];
@@ -107,7 +108,7 @@ function draw() {
   ctx.fillStyle = INK; ctx.fillRect(paddle.x - paddle.w / 2, paddle.y, paddle.w, paddle.h);
   ctx.fillStyle = INK; ctx.fillRect(ball.x - ball.r, ball.y - ball.r, ball.r * 2, ball.r * 2);
   text('SCORE ' + score, 10, 30, 16, INK, 'left');
-  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 30, 16, MID);
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 30, 16, LABEL);
   text('♥'.repeat(lives), W - 10, 30, 16, INK, 'right');
   if (state === 'ready') text('Press A to launch', W / 2, H / 2 + 60, 18, INK);
   if (state === 'paused') text('PAUSED', W / 2, H / 2, 28, INK);

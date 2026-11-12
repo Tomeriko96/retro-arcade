@@ -4,7 +4,7 @@
 window.Arcade = (() => {
   const NAMES = ['up', 'down', 'left', 'right', 'a', 'b', 'start', 'select', 'reset'];
   const KEYS = { arrowup:'up', w:'up', arrowdown:'down', s:'down', arrowleft:'left', a:'left',
-    arrowright:'right', d:'right', z:'a', ' ':'a', x:'b', enter:'start', p:'start', escape:'select', backspace:'select', r:'reset' };
+    arrowright:'right', d:'right', z:'a', ' ':'a', x:'b', enter:'start', p:'start', escape:'select', r:'reset' };
   const held = Object.fromEntries(NAMES.map((n) => [n, false]));
   const handlers = Object.fromEntries(NAMES.map((n) => [n, []]));
   const views = {}; // name -> elements to highlight
@@ -60,7 +60,7 @@ window.Arcade = (() => {
     document.title = title + ' \u2013 Retro Arcade';
     document.documentElement.style.setProperty('--ar', W + ' / ' + H);
     const L = { ...LABELS, ...labels };
-    const btn = (cls, k, small) => `<div class="btn ${cls}${L[k] === null ? ' off' : ''}"><button data-k="${k}" aria-label="${L[k] || k}"></button>${small ? '' : `<label>${L[k] || ''}</label>`}</div>`;
+    const btn = (cls, k, small) => `<div class="btn ${cls}${L[k] === null ? ' off' : ''}"><button data-k="${k}" aria-label="${L[k] || k}"></button>${small ? '' : `<span class="cap">${L[k] || ''}</span>`}</div>`;
     const rows = ['up', 'left', 'right', 'down', 'a', 'b'].filter((k) => L[k] !== null).map((k) => [KEYHINT[k], L[k]])
       .concat([['Enter / P', 'Pause'], ['R', 'Reset'], ['Esc', 'Menu']]);
     const legend = rows.map(([k, v]) => `<div class="row"><kbd>${k}</kbd>${v}</div>`).join('');
@@ -69,13 +69,14 @@ window.Arcade = (() => {
     root.innerHTML = `
       <h1 class="sr-only">${title} \u2013 Retro Arcade</h1>
       <div id="arcade-live" class="sr-only" role="status" aria-live="polite"></div>
+      <div class="toast" aria-hidden="true"></div>
       <div class="top"><a href="../" aria-label="Back to game menu" aria-keyshortcuts="Escape">&larr; menu</a><span aria-hidden="true"></span><button class="ui-toggle" type="button"></button></div>
       <div class="screen"><canvas role="img" aria-label="${title} game screen"></canvas></div>
       <div class="left">
         <div class="small">
-          <div class="btn green"><button data-k="start" aria-label="Pause"></button><label>Pause(P)</label></div>
-          <div class="btn green"><button data-k="select" aria-label="Menu"></button><label>Menu(Esc)</label></div>
-          <div class="btn red"><button data-k="reset" aria-label="Reset"></button><label>Reset(R)</label></div>
+          <div class="btn green"><button data-k="start" aria-label="Pause"></button><span class="cap">Pause(P)</span></div>
+          <div class="btn green"><button data-k="select" aria-label="Menu"></button><span class="cap">Menu(Esc)</span></div>
+          <div class="btn red"><button data-k="reset" aria-label="Reset"></button><span class="cap">Reset(R)</span></div>
         </div>
         <div class="big">${btn('a', 'a')}${btn('b', 'b')}</div>
       </div>
@@ -102,7 +103,23 @@ window.Arcade = (() => {
     toggle.addEventListener('click', () => setMode(document.documentElement.dataset.ui === 'desktop' ? 'handheld' : 'desktop', true));
     root.querySelectorAll('button[data-k]').forEach((b) => bindButton(b, b.dataset.k));
     handlers.select.push(() => { location.href = '../'; });
-    handlers.reset.push(() => { location.reload(); });
+    // Reset throws away the run, and it sits right next to Pause under a thumb: ask for a second press.
+    let resetArmed = 0;
+    const toast = root.querySelector('.toast');
+    handlers.reset.push(() => {
+      if (Date.now() < resetArmed) { location.reload(); return; }
+      resetArmed = Date.now() + 1800;
+      toast.textContent = 'Press Reset (R) again to restart';
+      toast.classList.add('show');
+      Arcade.announce(toast.textContent);
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    });
+    const bars = () => {
+      root.style.setProperty('--bar-top', root.querySelector('.top').offsetHeight + 'px');
+      root.style.setProperty('--bar-bottom', root.querySelector('.legend').offsetHeight + 'px');
+    };
+    if (window.ResizeObserver) { const ro = new ResizeObserver(bars); ro.observe(root.querySelector('.top')); ro.observe(root.querySelector('.legend')); }
+    bars();
     const cv = root.querySelector('canvas');
     const ctx = cv.getContext('2d');
     // Games draw in W x H logical units. Keep the backing store at the size actually shown (x devicePixelRatio) so
@@ -131,6 +148,7 @@ window.Arcade = (() => {
     held, mount,
     // LCD palette shared by every game: dark pixels on a green-grey screen.
     ink: '#1b2210', mid: '#5e6b47', lcd: '#9ead86',
+    label: '#333c28', // HUD text: 4.8:1 on the LCD green (mid is only 2.4:1, fine for decoration, not for text)
     on(name, fn) { handlers[name].push(fn); },
     watch(fn) { watchers.push(fn); },
     hi(id) { try { return Number(localStorage.getItem('arcade:hi:' + id)) || 0; } catch (e) { return 0; } },

@@ -8,6 +8,7 @@
 <meta name="description" content="Blast drifting asteroids before they hit you. Free, offline, no account.">
 <meta name="theme-color" content="#f2cb1c">
 <meta name="application-name" content="Retro Arcade">
+<meta name="apple-mobile-web-app-title" content="Retro Arcade">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
@@ -36,7 +37,7 @@
 const W = 360, H = 480, ID = 'rocks';
 const { ctx } = Arcade.mount({ title: 'Space Rocks', W, H, labels: { left: 'Turn', right: 'Turn', up: 'Thrust', down: null, a: 'Fire', b: 'Warp' } });
 const held = Arcade.held;
-const INK = Arcade.ink, MID = Arcade.mid, LCD = Arcade.lcd;
+const INK = Arcade.ink, MID = Arcade.mid, LABEL = Arcade.label, LCD = Arcade.lcd;
 
 const TAU = Math.PI * 2;
 const SIZES = [{ r: 9, pts: 100 }, { r: 17, pts: 50 }, { r: 30, pts: 20 }]; // index = size 0 small .. 2 large
@@ -152,9 +153,9 @@ function draw() {
     if (held.up && Math.random() < 0.8) { ctx.beginPath(); ctx.moveTo(...px(Math.PI + 0.25, 6)); ctx.lineTo(...px(Math.PI, 14 + Math.random() * 5)); ctx.lineTo(...px(Math.PI - 0.25, 6)); ctx.stroke(); }
   }
   text('SCORE ' + score, 10, 24, 14, INK, 'left');
-  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 24, 14, MID);
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 24, 14, LABEL);
   text('♥'.repeat(Math.max(0, lives)), W - 10, 24, 14, INK, 'right');
-  text('WAVE ' + wave, 10, H - 10, 11, MID, 'left');
+  text('WAVE ' + wave, 10, H - 10, 11, LABEL, 'left');
   if (state === 'ready') { text('Left/Right turn, Up thrust', W / 2, H / 2 + 70, 13, INK); text('Hold A to fire', W / 2, H / 2 + 90, 13, INK); text('Press A to start', W / 2, H / 2 + 120, 15, INK); }
   if (state === 'paused') text('PAUSED', W / 2, H / 2 - 40, 26, INK);
   if (state === 'over') { text('GAME OVER', W / 2, H / 2 - 40, 26, INK); text('Press A to play again', W / 2, H / 2 - 12, 14, INK); }

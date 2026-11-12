@@ -8,6 +8,7 @@
 <meta name="description" content="Shoot down enemies in a side-scrolling level. Free, offline, no account.">
 <meta name="theme-color" content="#f2cb1c">
 <meta name="application-name" content="Retro Arcade">
+<meta name="apple-mobile-web-app-title" content="Retro Arcade">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
@@ -36,7 +37,7 @@
 const W = 540, H = 320, ID = 'shooter';
 const { ctx } = Arcade.mount({ title: 'Side Shooter', W, H, labels: { a: 'Fire', b: null } });
 const held = Arcade.held;
-const INK = Arcade.ink, MID = Arcade.mid, LCD = Arcade.lcd;
+const INK = Arcade.ink, MID = Arcade.mid, LABEL = Arcade.label, LCD = Arcade.lcd;
 
 let ship, bullets, enemies, stars, score, lives, state, spawnT, fireT, t0; // ready | play | paused | over
 
@@ -108,7 +109,7 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(e.x - 11, e.y); ctx.lineTo(e.x + 11, e.y - 8); ctx.lineTo(e.x + 11, e.y + 8); ctx.fill();
   }
   text('SCORE ' + score, 10, 22, 14, INK, 'left');
-  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 22, 14, MID);
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 22, 14, LABEL);
   text('♥'.repeat(Math.max(0, lives)), W - 10, 22, 14, INK, 'right');
   if (state === 'ready') { text('D-pad to move, hold A to fire', W / 2, H / 2, 15, INK); text('Press A to start', W / 2, H / 2 + 24, 15, INK); }
   if (state === 'paused') text('PAUSED', W / 2, H / 2, 28, INK);

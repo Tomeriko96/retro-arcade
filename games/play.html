@@ -8,6 +8,7 @@
 <meta name="description" content="Classic mini-games. Installable, offline, no account.">
 <meta name="theme-color" content="#f2cb1c">
 <meta name="application-name" content="Retro Arcade">
+<meta name="apple-mobile-web-app-title" content="Retro Arcade">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
@@ -92,6 +93,7 @@ else {
   const { cv, wake } = Arcade.mount({ title: g.title, W: w * 100, H: h * 100, labels: g.labels });
   const frame = document.createElement('iframe');
   frame.setAttribute('sandbox', 'allow-scripts allow-same-origin'); // vendored code: no popups, forms, modals or top-level navigation
+  frame.tabIndex = -1; // not a tab stop: keys are forwarded by the console, and focus inside the frame would swallow Esc/R/P
   frame.src = g.src; frame.title = g.title; frame.className = 'lcd-' + g.lcd;
   frame.style.width = g.vw + 'px'; frame.style.height = (g.vw * h / w) + 'px';
   cv.replaceWith(frame);

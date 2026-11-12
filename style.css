@@ -12,7 +12,8 @@ p.sub { text-align:center; margin:0 0 16px; font-size:.85rem; color:#5a4a08; }
 .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .card { display:block; padding:12px 14px; background:var(--lcd); border:5px solid #000; border-radius:4px;
   color:var(--ink); text-decoration:none; box-shadow: 0 0 0 3px var(--body), 0 0 0 5px #000; margin:5px; }
-.card:active, .card:focus-visible { background:var(--ink); color:var(--lcd); outline:none; }
+.card:active, .card:focus-visible { background:var(--ink); color:var(--lcd); }
+.card:focus-visible { outline:3px solid var(--ink); outline-offset:7px; }
 .card:active p, .card:focus-visible p, .card:active .hi, .card:focus-visible .hi { color:var(--lcd); }
 .card h2 { margin:0 0 4px; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; }
 .card p { margin:0 0 8px; color:var(--mid); font-size:.8rem; min-height:2.4em; }
@@ -36,5 +37,5 @@ footer a { color:inherit; display:inline-block; padding:15px 8px; margin:-15px -
 #update-toast { position:fixed; left:12px; right:12px; bottom:12px; max-width:420px; margin:0 auto; padding:10px 14px; display:flex; gap:12px;
   align-items:center; justify-content:space-between; background:var(--ink); color:var(--lcd); border-radius:8px; font-size:.85rem; z-index:10; }
 #update-toast[hidden], .pwa [hidden] { display:none; }
-#update-toast button { padding:8px 14px; min-height:40px; box-shadow:none; border-color:var(--lcd); }
+#update-toast button { padding:8px 14px; min-height:44px; box-shadow:none; border-color:var(--lcd); }
 html { touch-action: manipulation; } /* no double-tap delay; pinch-zoom stays available on the launcher */

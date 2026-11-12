@@ -8,6 +8,7 @@
   <meta name="description" content="Classic mini-games. Installable, offline, no account.">
   <meta name="theme-color" content="#f2cb1c">
   <meta name="application-name" content="Retro Arcade">
+  <meta name="apple-mobile-web-app-title" content="Retro Arcade">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -61,17 +62,20 @@
 // Cards are static HTML (they work without JS); JS only adds the high scores.
 const num = (k) => { try { return Number(localStorage.getItem(k)) || 0; } catch (e) { return 0; } };
 const json = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+const list = (k) => { const v = json(k); return Array.isArray(v) ? v : []; }; // stored data can be anything
 // Where each game keeps its best score. Games without an entry show where the score lives instead of a fake 0.
 const HI = {
   breakout: () => num('arcade:hi:breakout'), blocks: () => num('arcade:hi:blocks'),
   rocks: () => num('arcade:hi:rocks'), shooter: () => num('arcade:hi:shooter'), snake: () => num('arcade:hi:snake'),
   yanoid: () => num('yanoid.highScore'),
-  hextris: () => Math.max(0, ...(json('highscores') || []).map(Number).filter(Number.isFinite)),
+  hextris: () => Math.max(0, ...list('highscores').map(Number).filter(Number.isFinite)),
 };
 const NOTE = { netris: 'No score, just lines', invaders: 'Score shown in game', asteroids: 'Top 10 kept in game' };
 for (const a of document.querySelectorAll('.card[data-id]')) {
   const id = a.dataset.id;
-  a.querySelector('.hi').textContent = HI[id] ? 'High score: ' + HI[id]() : (NOTE[id] || '');
+  let text = NOTE[id] || '';
+  try { if (HI[id]) text = 'High score: ' + HI[id](); } catch (e) { text = ''; } // one bad entry must not stop the other cards
+  a.querySelector('.hi').textContent = text;
 }
 </script>
 </body>
