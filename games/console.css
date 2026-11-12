@@ -75,15 +75,23 @@ button { font:inherit; touch-action:none; }
 .ui-toggle { font-size:11px; font-weight:600; color:var(--ink); background:transparent; border:2px solid var(--ink); border-radius:12px; padding:2px 8px; cursor:pointer; }
 .legend { display:none; }
 
-/* Desktop: no handheld, just a big screen with the keys listed underneath. */
-:root[data-ui=desktop] body { align-items:flex-start; }
-:root[data-ui=desktop] .gb { width:min(100vw, 1000px); background:transparent; box-shadow:none; border-radius:0; padding:14px 20px 20px;
-  grid-template-columns: 1fr; grid-template-areas: "top" "screen" "legend"; align-content:start; }
+/* Desktop: the game fills the window and is played with the keyboard. The header and key list only
+   show for a moment when the mouse moves, then fade away (and the cursor hides while idle). */
+:root[data-ui=desktop], :root[data-ui=desktop] body { background:var(--lcd); }
+:root[data-ui=desktop] body { min-height:100vh; min-height:100dvh; overflow:hidden; }
+:root[data-ui=desktop] .gb { position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; padding:0; gap:0; display:flex;
+  align-items:center; justify-content:center; background:transparent; box-shadow:none; border-radius:0; }
 :root[data-ui=desktop] .left, :root[data-ui=desktop] .right, :root[data-ui=desktop] .hint { display:none; }
-:root[data-ui=desktop] .top { color:#fff; } :root[data-ui=desktop] .top a { color:#fff; }
+:root[data-ui=desktop] .screen { width:min(100vw, calc(100vh * var(--ar))); width:min(100vw, calc(100dvh * var(--ar)));
+  margin:0; border:0; border-radius:0; box-shadow:none; }
+:root[data-ui=desktop] .top, :root[data-ui=desktop] .legend { position:fixed; left:0; right:0; z-index:5; display:flex;
+  background:rgba(27,34,16,.88); color:#fff; padding:10px 18px; opacity:0; pointer-events:none; transition:opacity .3s; }
+:root[data-ui=desktop] .top { top:0; } :root[data-ui=desktop] .top a { color:#fff; }
 :root[data-ui=desktop] .ui-toggle { color:#fff; border-color:#fff; }
-:root[data-ui=desktop] .screen { width:min(100%, calc((100vh - 200px) * var(--ar))); width:min(100%, calc((100dvh - 200px) * var(--ar))); margin:12px 0 4px; }
-:root[data-ui=desktop] .legend { display:block; grid-area:legend; justify-self:center; color:#fff; margin-top:10px; }
+:root[data-ui=desktop] .legend { bottom:0; flex-direction:column; align-items:center; }
+:root[data-ui=desktop] .gb.show .top, :root[data-ui=desktop] .gb.show .legend { opacity:1; pointer-events:auto; }
+:root[data-ui=desktop] .gb:not(.show) { cursor:none; }
+.legend b { color:#fff; }
 .legend b { display:block; margin-bottom:6px; font-size:15px; letter-spacing:.1em; text-transform:uppercase; text-align:center; }
 .legend .rows { display:flex; flex-wrap:wrap; gap:8px 22px; justify-content:center; }
 .legend .row { white-space:nowrap; font-size:13px; }

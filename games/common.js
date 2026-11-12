@@ -86,13 +86,18 @@ window.Arcade = (() => {
       if (save) { try { localStorage.setItem('arcade:ui', m); } catch (e) {} }
     };
     setMode(uiMode(), false);
+    // Desktop view: show the header + key list briefly on load and whenever the mouse moves.
+    let idle = 0;
+    const wake = () => { root.classList.add('show'); clearTimeout(idle); idle = setTimeout(() => root.classList.remove('show'), 2500); };
+    addEventListener('mousemove', wake);
+    wake();
     toggle.addEventListener('click', () => setMode(document.documentElement.dataset.ui === 'desktop' ? 'handheld' : 'desktop', true));
     root.querySelectorAll('button[data-k]').forEach((b) => bindButton(b, b.dataset.k));
     handlers.select.push(() => { location.href = '../'; });
     handlers.reset.push(() => { location.reload(); });
     const cv = root.querySelector('canvas');
     cv.width = W; cv.height = H;
-    return { cv, ctx: cv.getContext('2d') };
+    return { cv, ctx: cv.getContext('2d'), wake };
   }
 
   return {
