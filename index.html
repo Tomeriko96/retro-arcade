@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Retro Arcade</title>
   <meta name="theme-color" content="#111122">
   <link rel="manifest" href="manifest.webmanifest">
@@ -17,6 +17,7 @@
   <div class="grid" id="grid"></div>
   <footer>High scores are stored on this device only.</footer>
 </main>
+<script src="games/nozoom.js"></script>
 <script>
 const GAMES = [
   { id: 'breakout', title: 'Breakout', desc: 'Bounce the ball, break the bricks.', href: 'games/breakout.html' },

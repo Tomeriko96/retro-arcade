@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Retro Arcade</title>
 <link rel="stylesheet" href="console.css">
 <style>
@@ -11,6 +11,7 @@
 </style>
 </head>
 <body>
+<script src="nozoom.js"></script>
 <script src="common.js"></script>
 <script>
 // Hosts a vendored GPL/MIT game in an iframe inside the console and turns console buttons into key events.
@@ -46,6 +47,8 @@ else {
   frame.src = g.src; frame.title = g.title;
   frame.style.width = g.vw + 'px'; frame.style.height = (g.vw * h / w) + 'px';
   cv.replaceWith(frame);
+  frame.style.touchAction = 'manipulation';
+  frame.addEventListener('load', () => window.noZoom(frame.contentWindow, false));
   const box = frame.parentElement;
   const fit = () => { frame.style.transform = 'scale(' + (box.clientWidth / g.vw) + ')'; };
   new ResizeObserver(fit).observe(box); fit();

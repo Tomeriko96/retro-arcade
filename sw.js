@@ -1,7 +1,7 @@
-const CACHE = 'retro-arcade-v5';
+const CACHE = 'retro-arcade-v6';
 const ASSETS = [
   './', './index.html', './style.css', './manifest.webmanifest',
-  './games/common.js', './games/console.css',
+  './games/common.js', './games/nozoom.js', './games/console.css',
   './games/breakout.html', './games/shooter.html', './games/blocks.html', './games/play.html',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
   // Vendored third-party games (see THIRD_PARTY.md)
