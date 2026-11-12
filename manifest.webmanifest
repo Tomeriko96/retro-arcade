@@ -1,18 +1,65 @@
 {
   "name": "Retro Arcade",
   "short_name": "Arcade",
+  "id": "./",
   "description": "Small classic games, playable offline.",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
-  "display_override": ["fullscreen", "standalone"],
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
   "orientation": "any",
   "background_color": "#009688",
   "theme_color": "#f2cb1c",
   "lang": "en",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "games"
+  ],
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "Breakout",
+      "url": "games/breakout.html"
+    },
+    {
+      "name": "Blocks",
+      "url": "games/blocks.html"
+    },
+    {
+      "name": "Space Rocks",
+      "url": "games/rocks.html"
+    },
+    {
+      "name": "Side Shooter",
+      "url": "games/shooter.html"
+    },
+    {
+      "name": "Snake",
+      "url": "games/play.html?g=snake"
+    },
+    {
+      "name": "Space Invaders",
+      "url": "games/play.html?g=invaders"
+    }
   ]
 }

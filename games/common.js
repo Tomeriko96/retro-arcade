@@ -55,7 +55,7 @@ window.Arcade = (() => {
   // labels: per-button caption; null hides a button the game does not use.
   const LABELS = { up:'Up', down:'Down', left:'Left', right:'Right', a:'A', b:'B' };
   function mount({ title, W, H, labels = {} }) {
-    document.title = title;
+    document.title = title + ' \u2013 Retro Arcade';
     document.documentElement.style.setProperty('--ar', W + ' / ' + H);
     const L = { ...LABELS, ...labels };
     const btn = (cls, k, small) => `<div class="btn ${cls}${L[k] === null ? ' off' : ''}"><button data-k="${k}" aria-label="${L[k] || k}"></button>${small ? '' : `<label>${L[k] || ''}</label>`}</div>`;

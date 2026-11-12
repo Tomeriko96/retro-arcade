@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tomeriko96.github.io/retro-arcade/sitemap.xml
