@@ -1,7 +1,7 @@
-const CACHE = 'retro-arcade-c45f599878';
+const CACHE = 'retro-arcade-e57a46cf6e';
 // Must all succeed: the launcher, our own games and the licence texts. If one fails the install is retried.
 const CORE = [
-  './', './index.html', './style.css', './manifest.webmanifest',
+  './', './index.html', './offline.html', './style.css', './manifest.webmanifest',
   './pwa.js', './games/common.js', './games/nozoom.js', './games/console.css',
   './games/breakout.html', './games/shooter.html', './games/blocks.html', './games/rocks.html', './games/play.html',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
@@ -132,7 +132,12 @@ self.addEventListener('install', (e) => {
 // Best-effort: one failed file never matters, and anything missed is cached when it is first played.
 self.addEventListener('message', (e) => {
   if (e.data !== 'warm') return;
-  e.waitUntil(caches.open(CACHE).then((c) => Promise.allSettled(VENDOR.map((u) => c.match(u).then((hit) => hit || c.add(u))))));
+  const client = e.source;
+  e.waitUntil(caches.open(CACHE).then(async (c) => {
+    const results = await Promise.allSettled(VENDOR.map(async (u) => { if (!(await c.match(u))) await c.add(u); }));
+    // Tell the page how it went, so it can say whether offline play is ready (see pwa.js). Failures are retried on the next visit.
+    if (client) client.postMessage({ type: 'warm-done', total: VENDOR.length, failed: results.filter((r) => r.status === 'rejected').length });
+  }));
 });
 
 self.addEventListener('activate', (e) => {
@@ -154,7 +159,7 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put(e.request, copy));
         }
         return res;
-      }).catch(() => (e.request.mode === 'navigate' ? caches.match('./index.html') : Response.error()))
+      }).catch(() => (e.request.mode === 'navigate' ? caches.match('./offline.html') : Response.error()))
     )
   );
 });

@@ -24,7 +24,20 @@
 
   if (!('serviceWorker' in navigator)) return;
   const showUpdate = () => { if (toast) toast.hidden = false; };
+  // Say whether the games are saved for offline play. The service worker reports back after caching them.
+  const status = $('offline-status');
+  const KEY = 'arcade:offline-ready';
+  const say = (t) => { if (status) status.textContent = t; };
+  let wasReady = false;
+  try { wasReady = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    const m = e.data;
+    if (!m || m.type !== 'warm-done') return;
+    if (m.failed === 0) { say('\u2713 Ready to play offline'); try { localStorage.setItem(KEY, '1'); } catch (x) {} }
+    else say('Offline: ' + m.failed + ' of ' + m.total + ' game files could not be saved. Retrying on your next visit.');
+  });
   function warmCache(reg) {
+    say(wasReady ? '\u2713 Ready to play offline' : 'Saving games for offline play\u2026');
     // Fetch the vendored games in the background once the page is idle.
     const go = () => reg.active && reg.active.postMessage('warm');
     (window.requestIdleCallback || ((f) => setTimeout(f, 2000)))(go);

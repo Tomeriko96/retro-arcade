@@ -51,3 +51,5 @@ GPL-3.0-or-later, see `LICENSE`. Vendored games keep their own licenses, listed 
 - `404.html` uses root-relative `/retro-arcade/...` paths because GitHub Pages serves it at the missing URL's depth. If the repo or Pages path is renamed, update them.
 - `.nojekyll` keeps GitHub Pages from running Jekyll over the site.
 - The launcher deliberately does not load `games/nozoom.js`, so pinch-zoom works there; game pages load it to keep the play surface from zooming.
+- **Offline:** the shell and your games are cached on install; the vendored games are fetched in the background and the launcher says when everything is saved (`✓ Ready to play offline`). A page that is not saved opens `offline.html` (which lists what is saved) instead of silently showing the menu.
+- **Updates:** a new service worker activates as soon as it is installed, but pages that are already open keep running the old code until they are reloaded (`clients.claim()` is not used, to keep the back/forward cache). The launcher shows a Reload toast when a new version is ready.

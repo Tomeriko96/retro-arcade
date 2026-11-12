@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f2cb1c">
+  <link rel="icon" href="data:,"> <!-- no favicon request: this page can be served at any URL depth -->
+  <title>Offline – Retro Arcade</title>
+  <!-- Served by the service worker for any page that is not saved on this device while offline. It can be shown at any
+       URL depth, so it is self-contained (inline styles) and builds its links from the service worker's scope. -->
+  <style>
+    :root { --page:#009688; --body:#f2cb1c; --ink:#1b2210; --lcd:#9ead86; --mid:#333c28; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; min-height:100dvh; background:var(--page); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; display:grid; place-items:center; padding:16px; }
+    main { width:min(100%, 440px); background:var(--body); border-radius:14px; box-shadow:inset 0 0 0 3px #c9a21a; padding:20px 18px; text-align:center; }
+    h1 { margin:0 0 8px; font-size:1.05rem; letter-spacing:.14em; text-transform:uppercase; }
+    p { margin:0 0 14px; font-size:.9rem; }
+    .screen { background:var(--lcd); border:5px solid #000; border-radius:4px; padding:12px; text-align:left; margin-bottom:16px; }
+    .screen h2 { margin:0 0 6px; font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; }
+    ul { list-style:none; margin:0; padding:0; font-size:.9rem; }
+    li { padding:3px 0; } li.no { color:var(--mid); }
+    a { color:var(--ink); font-weight:700; }
+    .back { display:inline-block; padding:12px 18px; min-height:44px; background:var(--lcd); border:3px solid #000; border-radius:6px; text-decoration:none; }
+    a:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>You're offline</h1>
+  <p>This page isn't saved on this device yet, so it can't open without a connection.</p>
+  <div class="screen">
+    <h2>Saved for offline play</h2>
+    <ul id="list"><li class="no">Checking…</li></ul>
+  </div>
+  <a class="back" id="back" href="./" target="_top">Back to the menu</a>
+</main>
+<script>
+// [title, page to link to, file that proves it is saved]
+const GAMES = [
+  ['Breakout', 'games/breakout.html', 'games/breakout.html'], ['Blocks', 'games/blocks.html', 'games/blocks.html'],
+  ['Space Rocks', 'games/rocks.html', 'games/rocks.html'], ['Side Shooter', 'games/shooter.html', 'games/shooter.html'],
+  ['Netris', 'games/play.html?g=netris', 'games/vendor/netris/index.html'], ['Hextris', 'games/play.html?g=hextris', 'games/vendor/hextris/index.html'],
+  ['Asteroids Infinity', 'games/play.html?g=asteroids', 'games/vendor/asteroids-infinity/index.html'],
+  ['Yanoid', 'games/play.html?g=yanoid', 'games/vendor/yanoid/index.html'], ['Space Invaders', 'games/play.html?g=invaders', 'games/vendor/html5-space-invaders/index.html'],
+  ['Snake', 'games/play.html?g=snake', 'games/vendor/html5-snake/index.html'],
+];
+(async () => {
+  const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+  const base = reg ? reg.scope : new URL('./', location.href).href;
+  document.getElementById('back').href = base;
+  const list = document.getElementById('list'); list.textContent = '';
+  for (const [title, page, proof] of GAMES) {
+    const saved = !!(await caches.match(new URL(proof, base).href));
+    const li = document.createElement('li');
+    if (saved) { const a = document.createElement('a'); a.href = new URL(page, base).href; a.target = '_top'; a.textContent = title; li.appendChild(a); }
+    else { li.className = 'no'; li.textContent = title + ' (not saved yet)'; }
+    list.appendChild(li);
+  }
+})().catch(() => { document.getElementById('list').textContent = ''; });
+</script>
+</body>
+</html>
