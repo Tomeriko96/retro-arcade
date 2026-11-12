@@ -55,14 +55,14 @@ window.Arcade = (() => {
   const KEYHINT = { up: '&uarr; / W', down: '&darr; / S', left: '&larr; / A', right: '&rarr; / D', a: 'Z / Space', b: 'X' };
 
   // labels: per-button caption; null hides a button the game does not use.
-  const LABELS = { up:'Up', down:'Down', left:'Left', right:'Right', a:'A', b:'B' };
+  const LABELS = { up:'Up', down:'Down', left:'Left', right:'Right', a:'A', b:'B', start:'Pause' }; // start = the small green button
   function mount({ title, W, H, labels = {} }) {
     document.title = title + ' \u2013 Retro Arcade';
     document.documentElement.style.setProperty('--ar', W + ' / ' + H);
     const L = { ...LABELS, ...labels };
     const btn = (cls, k, small) => `<div class="btn ${cls}${L[k] === null ? ' off' : ''}"><button data-k="${k}" aria-label="${L[k] || k}"></button>${small ? '' : `<span class="cap">${L[k] || ''}</span>`}</div>`;
     const rows = ['up', 'left', 'right', 'down', 'a', 'b'].filter((k) => L[k] !== null).map((k) => [KEYHINT[k], L[k]])
-      .concat([['Enter / P', 'Pause'], ['R', 'Reset'], ['Esc', 'Menu']]);
+      .concat([['Enter / P', L.start], ['R', 'Reset'], ['Esc', 'Menu']]);
     const legend = rows.map(([k, v]) => `<div class="row"><kbd>${k}</kbd>${v}</div>`).join('');
     const root = document.createElement('main');
     root.className = 'gb';
@@ -74,7 +74,7 @@ window.Arcade = (() => {
       <div class="screen"><canvas role="img" aria-label="${title} game screen"></canvas></div>
       <div class="left">
         <div class="small">
-          <div class="btn green"><button data-k="start" aria-label="Pause"></button><span class="cap">Pause(P)</span></div>
+          <div class="btn green"><button data-k="start" aria-label="${L.start}"></button><span class="cap">${L.start}(P)</span></div>
           <div class="btn green"><button data-k="select" aria-label="Menu"></button><span class="cap">Menu(Esc)</span></div>
           <div class="btn red"><button data-k="reset" aria-label="Reset"></button><span class="cap">Reset(R)</span></div>
         </div>
@@ -85,7 +85,7 @@ window.Arcade = (() => {
         <div class="mark" aria-hidden="true"><i class="mu">&#9650;</i><i class="ml">&#9664;</i><i class="mr">&#9654;</i><i class="md">&#9660;</i></div>
       </div></div>
       <div class="legend"><b>Controls</b><div class="rows">${legend}</div></div>
-      <p class="hint">Arrows / WASD &middot; Z or Space = A &middot; X = B &middot; Enter / P = Pause &middot; R = Reset &middot; Esc = Menu</p>`;
+      <p class="hint">Arrows / WASD &middot; Z or Space = A &middot; X = B &middot; Enter / P = ${L.start} &middot; R = Reset &middot; Esc = Menu</p>`;
     document.body.appendChild(root);
     root.querySelector('.top span').textContent = title;
     const toggle = root.querySelector('.ui-toggle');

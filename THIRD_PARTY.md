@@ -21,12 +21,16 @@ folder (`LICENSE`, `CREDITS.md`, `LICENSE.md`, `UPSTREAM-*`).
 - Removed the GoatCounter analytics `<script>` tag from every `index.html`, so no game phones home.
 - Hextris (`js/initialization.js`): the saved game is now written on `pagehide`/`visibilitychange` instead of
   `unload`, which Chromium blocks, so the save never happened.
+- Hextris (`index.html`): the placeholder high score in the markup is `0` instead of a made-up `10292`, which
+  showed for a moment before the game's script replaced it.
 - Netris (`index.html`): the footer link to a missing `SOFTWARE_ARCHAEOLOGY.md` now points to the shipped
   `UPSTREAM-PROVENANCE.md`.
 - Nothing else in the game code is modified. They run inside a sandboxed iframe (`games/play.html`), which sends
   key events to them from the on-screen console buttons. `play.html` also injects a small stylesheet per game to
   hide vendor menus that duplicate the console, and repaints Snake's start screen; those are integration code in
-  this repository, not edits to the vendored files.
+  this repository, not edits to the vendored files. The same goes for the accessibility fixes it applies to the
+  loaded vendor pages (page language, a main landmark, a hidden heading, alt text on Hextris' icon buttons) and
+  for discarding an unreadable Hextris save before the game boots.
 
 **Rule:** every edit to a file under `games/vendor/` must add a line to this list.
 
