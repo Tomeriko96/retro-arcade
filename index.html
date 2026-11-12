@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Retro Arcade</title>
+  <meta name="theme-color" content="#111122">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>Retro Arcade</h1>
+  <p class="sub">Klassieke minigames. Installeerbaar, offline, zonder account.</p>
+  <div class="grid" id="grid"></div>
+  <footer>Highscores staan alleen op dit apparaat.</footer>
+</main>
+<script>
+const GAMES = [
+  { id: 'breakout', title: 'Breakout', desc: 'Balletje, batje, blokjes slopen.', href: 'games/breakout.html' },
+  { id: 'shooter',  title: 'Side Shooter', desc: 'Schiet vijanden neer in een zijwaarts scrollend level.', href: 'games/shooter.html' },
+];
+const grid = document.getElementById('grid');
+for (const g of GAMES) {
+  let hi = 0;
+  try { hi = Number(localStorage.getItem('arcade:hi:' + g.id)) || 0; } catch (e) {}
+  const a = document.createElement('a');
+  a.className = 'card'; a.href = g.href;
+  a.innerHTML = `<h2></h2><p></p><span class="hi"></span>`;
+  a.querySelector('h2').textContent = g.title;
+  a.querySelector('p').textContent = g.desc;
+  a.querySelector('.hi').textContent = 'Highscore: ' + hi;
+  grid.appendChild(a);
+}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>

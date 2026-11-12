@@ -1,0 +1,15 @@
+:root { --bg:#111122; --fg:#39ff88; --ac:#ff4081; --card:#1b1b38; }
+* { box-sizing: border-box; }
+html, body { margin:0; background:var(--bg); color:var(--fg);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { color: var(--ac); letter-spacing: .15em; text-transform: uppercase; font-size: 1.6rem; }
+p.sub { color:#8f8fb8; margin-top:-8px; }
+.grid { display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.card { display:block; padding:16px; background:var(--card); border:2px solid var(--fg);
+  border-radius:8px; color:var(--fg); text-decoration:none; }
+.card:active, .card:focus-visible { border-color: var(--ac); outline:none; }
+.card h2 { margin:0 0 6px; font-size:1.1rem; }
+.card p { margin:0 0 10px; color:#b5b5d6; font-size:.85rem; }
+.card .hi { color:var(--ac); font-size:.85rem; }
+footer { margin-top:32px; color:#6a6a92; font-size:.75rem; }

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Breakout</title>
+<style>
+  html,body{margin:0;height:100%;background:#111122;overflow:hidden;touch-action:none;
+    display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace}
+  canvas{background:#0b0b1a;border:2px solid #39ff88;image-rendering:pixelated}
+  a{position:fixed;top:8px;left:8px;color:#39ff88;text-decoration:none;font-size:14px;z-index:2}
+</style>
+</head>
+<body>
+<a href="../">&larr; menu</a>
+<canvas id="c"></canvas>
+<script src="common.js"></script>
+<script>
+const W = 360, H = 540, ID = 'breakout';
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+Arcade.fit(cv, W, H);
+
+const COLS = 8, ROWS = 6, BW = W / COLS, BH = 20, TOP = 50;
+const COLORS = ['#ff4081','#ff9100','#ffeb3b','#39ff88','#40c4ff','#b388ff'];
+let paddle, ball, bricks, score, lives, state; // state: ready | play | over | won
+
+function reset() {
+  paddle = { x: W / 2, w: 64, h: 10, y: H - 40 };
+  bricks = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) bricks.push({ c, r, alive: true });
+  score = 0; lives = 3; serve();
+}
+function serve() {
+  ball = { x: paddle.x, y: paddle.y - 10, vx: 0, vy: 0, r: 6 };
+  state = 'ready';
+}
+function launch() {
+  const a = (Math.random() * 0.6 - 0.3);
+  ball.vx = 220 * Math.sin(a); ball.vy = -260; state = 'play';
+}
+function press() {
+  if (state === 'ready') launch();
+  else if (state === 'over' || state === 'won') reset();
+}
+cv.addEventListener('pointerdown', (e) => { move(e); press(); });
+cv.addEventListener('pointermove', move);
+function move(e) { paddle.x = Math.max(paddle.w / 2, Math.min(W - paddle.w / 2, Arcade.pos(cv, e).x)); }
+addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.key === 'Enter') press();
+  if (e.key === 'ArrowLeft') paddle.x = Math.max(paddle.w / 2, paddle.x - 24);
+  if (e.key === 'ArrowRight') paddle.x = Math.min(W - paddle.w / 2, paddle.x + 24);
+});
+
+function update(dt) {
+  if (state === 'ready') { ball.x = paddle.x; ball.y = paddle.y - 10; return; }
+  if (state !== 'play') return;
+  ball.x += ball.vx * dt; ball.y += ball.vy * dt;
+  if (ball.x < ball.r) { ball.x = ball.r; ball.vx = Math.abs(ball.vx); }
+  if (ball.x > W - ball.r) { ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx); }
+  if (ball.y < ball.r) { ball.y = ball.r; ball.vy = Math.abs(ball.vy); }
+  // Batje: hoek hangt af van waar de bal landt.
+  if (ball.vy > 0 && ball.y + ball.r >= paddle.y && ball.y - ball.r <= paddle.y + paddle.h &&
+      Math.abs(ball.x - paddle.x) <= paddle.w / 2 + ball.r) {
+    const t = (ball.x - paddle.x) / (paddle.w / 2);
+    const sp = Math.min(520, Math.hypot(ball.vx, ball.vy) * 1.02);
+    const ang = t * 1.0;
+    ball.vx = sp * Math.sin(ang); ball.vy = -sp * Math.cos(ang);
+    ball.y = paddle.y - ball.r;
+  }
+  for (const b of bricks) {
+    if (!b.alive) continue;
+    const bx = b.c * BW, by = TOP + b.r * BH;
+    if (ball.x + ball.r > bx && ball.x - ball.r < bx + BW && ball.y + ball.r > by && ball.y - ball.r < by + BH) {
+      b.alive = false; score += (ROWS - b.r) * 10;
+      const ox = Math.min(ball.x + ball.r - bx, bx + BW - (ball.x - ball.r));
+      const oy = Math.min(ball.y + ball.r - by, by + BH - (ball.y - ball.r));
+      if (ox < oy) ball.vx = -ball.vx; else ball.vy = -ball.vy;
+      break;
+    }
+  }
+  if (ball.y > H + 20) { lives--; if (lives <= 0) { state = 'over'; Arcade.saveHi(ID, score); } else serve(); }
+  if (bricks.every((b) => !b.alive)) { state = 'won'; Arcade.saveHi(ID, score); }
+}
+
+function text(t, x, y, size, color, align) {
+  ctx.fillStyle = color; ctx.font = `bold ${size}px ui-monospace, monospace`; ctx.textAlign = align || 'center';
+  ctx.fillText(t, x, y);
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (const b of bricks) if (b.alive) {
+    ctx.fillStyle = COLORS[b.r]; ctx.fillRect(b.c * BW + 1, TOP + b.r * BH + 1, BW - 2, BH - 2);
+  }
+  ctx.fillStyle = '#39ff88'; ctx.fillRect(paddle.x - paddle.w / 2, paddle.y, paddle.w, paddle.h);
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, 7); ctx.fill();
+  text('SCORE ' + score, 10, 30, 16, '#39ff88', 'left');
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 30, 16, '#8f8fb8');
+  text('♥'.repeat(lives), W - 10, 30, 16, '#ff4081', 'right');
+  if (state === 'ready') text('Tik om te starten', W / 2, H / 2 + 60, 18, '#fff');
+  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Tik voor opnieuw', W / 2, H / 2 + 30, 16, '#fff'); }
+  if (state === 'won') { text('GEWONNEN!', W / 2, H / 2, 28, '#39ff88'); text('Tik voor opnieuw', W / 2, H / 2 + 30, 16, '#fff'); }
+}
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.033, (now - last) / 1000); last = now;
+  update(dt); draw(); requestAnimationFrame(loop);
+}
+reset(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

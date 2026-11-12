@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Side Shooter</title>
+<style>
+  html,body{margin:0;height:100%;background:#111122;overflow:hidden;touch-action:none;
+    display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace}
+  canvas{background:#0b0b1a;border:2px solid #39ff88}
+  a{position:fixed;top:8px;left:8px;color:#39ff88;text-decoration:none;font-size:14px;z-index:2}
+</style>
+</head>
+<body>
+<a href="../">&larr; menu</a>
+<canvas id="c"></canvas>
+<script src="common.js"></script>
+<script>
+// Vingerbesturing: sleep om je schip te verplaatsen, het schip schiet automatisch.
+const W = 540, H = 320, ID = 'shooter';
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+Arcade.fit(cv, W, H);
+
+let ship, bullets, enemies, stars, score, lives, state, spawnT, fireT, t0;
+let target = null, keys = {};
+
+function reset() {
+  ship = { x: 50, y: H / 2, w: 24, h: 14, inv: 0 };
+  bullets = []; enemies = []; score = 0; lives = 3; spawnT = 0; fireT = 0; t0 = 0; state = 'ready';
+  stars = Array.from({ length: 40 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: 20 + Math.random() * 60 }));
+}
+function press() { if (state === 'ready') state = 'play'; else if (state === 'over') reset(); }
+
+cv.addEventListener('pointerdown', (e) => { target = Arcade.pos(cv, e); press(); });
+cv.addEventListener('pointermove', (e) => { if (e.buttons || e.pointerType === 'touch') target = Arcade.pos(cv, e); });
+addEventListener('keydown', (e) => { keys[e.key] = true; if (e.key === ' ') press(); });
+addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+function hit(a, b) { return Math.abs(a.x - b.x) < (a.w + b.w) / 2 && Math.abs(a.y - b.y) < (a.h + b.h) / 2; }
+
+function update(dt) {
+  for (const s of stars) { s.x -= s.s * dt; if (s.x < 0) { s.x = W; s.y = Math.random() * H; } }
+  if (state !== 'play') return;
+  t0 += dt;
+
+  const sp = 220;
+  if (target) {
+    ship.x += Math.max(-sp * dt, Math.min(sp * dt, target.x - ship.x));
+    ship.y += Math.max(-sp * dt, Math.min(sp * dt, target.y - ship.y));
+  }
+  if (keys.ArrowUp) ship.y -= sp * dt; if (keys.ArrowDown) ship.y += sp * dt;
+  if (keys.ArrowLeft) ship.x -= sp * dt; if (keys.ArrowRight) ship.x += sp * dt;
+  ship.x = Math.max(ship.w / 2, Math.min(W * 0.6, ship.x));
+  ship.y = Math.max(ship.h / 2, Math.min(H - ship.h / 2, ship.y));
+  ship.inv = Math.max(0, ship.inv - dt);
+
+  fireT -= dt;
+  if (fireT <= 0) { bullets.push({ x: ship.x + 14, y: ship.y, w: 8, h: 3 }); fireT = 0.22; }
+  for (const b of bullets) b.x += 420 * dt;
+  bullets = bullets.filter((b) => b.x < W + 10);
+
+  spawnT -= dt;
+  if (spawnT <= 0) {
+    const level = 1 + t0 / 30;
+    enemies.push({ x: W + 20, y: 20 + Math.random() * (H - 40), w: 22, h: 16,
+      vx: -(70 + 25 * level + Math.random() * 40), ph: Math.random() * 6, hp: 1 });
+    spawnT = Math.max(0.35, 1.1 - t0 / 90);
+  }
+  for (const e of enemies) { e.x += e.vx * dt; e.ph += dt * 3; e.y += Math.sin(e.ph) * 40 * dt; }
+
+  for (const e of enemies) for (const b of bullets) if (!b.dead && !e.dead && hit(e, b)) { e.dead = b.dead = true; score += 10; }
+  for (const e of enemies) if (!e.dead && ship.inv <= 0 && hit(e, ship)) {
+    e.dead = true; lives--; ship.inv = 1.5;
+    if (lives <= 0) { state = 'over'; Arcade.saveHi(ID, score); }
+  }
+  bullets = bullets.filter((b) => !b.dead);
+  enemies = enemies.filter((e) => !e.dead && e.x > -30);
+}
+
+function text(t, x, y, size, color, align) {
+  ctx.fillStyle = color; ctx.font = `bold ${size}px ui-monospace, monospace`; ctx.textAlign = align || 'center';
+  ctx.fillText(t, x, y);
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#556';
+  for (const s of stars) ctx.fillRect(s.x, s.y, 2, 2);
+  if (ship.inv <= 0 || Math.floor(ship.inv * 10) % 2) {
+    ctx.fillStyle = '#39ff88';
+    ctx.beginPath(); ctx.moveTo(ship.x + 14, ship.y); ctx.lineTo(ship.x - 12, ship.y - 8); ctx.lineTo(ship.x - 12, ship.y + 8); ctx.fill();
+  }
+  ctx.fillStyle = '#fff'; for (const b of bullets) ctx.fillRect(b.x - b.w / 2, b.y - 1, b.w, b.h);
+  ctx.fillStyle = '#ff4081';
+  for (const e of enemies) {
+    ctx.beginPath(); ctx.moveTo(e.x - 11, e.y); ctx.lineTo(e.x + 11, e.y - 8); ctx.lineTo(e.x + 11, e.y + 8); ctx.fill();
+  }
+  text('SCORE ' + score, 10, 22, 14, '#39ff88', 'left');
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 22, 14, '#8f8fb8');
+  text('♥'.repeat(Math.max(0, lives)), W - 10, 22, 14, '#ff4081', 'right');
+  if (state === 'ready') { text('Sleep om te sturen, schip schiet automatisch', W / 2, H / 2, 15, '#fff'); text('Tik om te starten', W / 2, H / 2 + 24, 15, '#39ff88'); }
+  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Tik voor opnieuw', W / 2, H / 2 + 28, 15, '#fff'); }
+}
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.033, (now - last) / 1000); last = now;
+  update(dt); draw(); requestAnimationFrame(loop);
+}
+reset(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
