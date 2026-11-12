@@ -74,6 +74,8 @@ window.Arcade = (() => {
 
   return {
     held, mount,
+    // LCD palette shared by every game: dark pixels on a green-grey screen.
+    ink: '#1b2210', mid: '#5e6b47', lcd: '#9ead86',
     on(name, fn) { handlers[name].push(fn); },
     watch(fn) { watchers.push(fn); },
     hi(id) { try { return Number(localStorage.getItem('arcade:hi:' + id)) || 0; } catch (e) { return 0; } },

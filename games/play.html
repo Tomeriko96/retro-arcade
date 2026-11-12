@@ -7,7 +7,10 @@
 <link rel="stylesheet" href="console.css">
 <style>
   .screen { position:relative; }
-  .screen iframe { position:absolute; left:0; top:0; border:0; background:#0b0b1a; transform-origin:0 0; }
+  .screen iframe { position:absolute; left:0; top:0; border:0; transform-origin:0 0; mix-blend-mode:multiply; }
+  /* Same LCD look as our own games: grayscale the page, then multiply it onto the green screen. Dark pages are inverted first. */
+  .screen iframe.lcd-light  { filter: grayscale(1) contrast(1.35); }
+  .screen iframe.lcd-invert { filter: grayscale(1) contrast(1.35) invert(1); }
 </style>
 </head>
 <body>
@@ -30,12 +33,12 @@ const K = {
 };
 const dirs = { left: K.left, right: K.right, up: K.up, down: K.down };
 const GAMES = {
-  netris:   { title: 'Netris',            src: 'vendor/netris/index.html',             ar: '3 / 5', vw: 480, labels: { up: 'Rotation', a: 'Rotate', b: 'Drop' }, keys: { ...dirs, a: K.up, b: K.p, start: K.s } },
-  hextris:  { title: 'Hextris',           src: 'vendor/hextris/index.html',            ar: '3 / 4', vw: 480, labels: { up: null, left: 'Rotate', right: 'Rotate', a: 'Start', b: 'Pause' }, keys: { ...dirs, a: K.enter, b: K.space, start: K.enter } },
-  asteroids:{ title: 'Asteroids Infinity',src: 'vendor/asteroids-infinity/index.html', ar: '4 / 5', vw: 520, labels: { up: 'Thrust', down: 'Brake', a: 'Fire', b: 'Shield' }, keys: { ...dirs, a: K.space, b: K.ctrl, start: K.enter } },
-  yanoid:   { title: 'Yanoid',            src: 'vendor/yanoid/index.html',             ar: '3 / 4', vw: 520, labels: { up: null, down: null, a: 'Fire', b: 'Pause' }, keys: { left: K.left, right: K.right, a: K.space, b: K.esc, start: { click: '#startBtn' } } },
-  invaders: { title: 'Space Invaders',    src: 'vendor/html5-space-invaders/index.html', ar: '4 / 5', vw: 640, labels: { up: null, down: null, a: 'Fire', b: 'Enter' }, keys: { left: K.left, right: K.right, a: K.space, b: K.enter, start: K.one } },
-  snake:    { title: 'Snake',             src: 'vendor/html5-snake/index.html',        ar: '5 / 2', vw: 720, labels: { a: 'Start', b: null }, keys: { ...dirs, a: K.enter, b: K.enter, start: K.enter } },
+  netris:   { title: 'Netris',            lcd: 'invert', src: 'vendor/netris/index.html',             ar: '3 / 5', vw: 480, labels: { up: 'Rotation', a: 'Rotate', b: 'Drop' }, keys: { ...dirs, a: K.up, b: K.p, start: K.s } },
+  hextris:  { title: 'Hextris',           lcd: 'light', src: 'vendor/hextris/index.html',            ar: '3 / 4', vw: 480, labels: { up: null, left: 'Rotate', right: 'Rotate', a: 'Start', b: 'Pause' }, keys: { ...dirs, a: K.enter, b: K.space, start: K.enter } },
+  asteroids:{ title: 'Asteroids Infinity',lcd: 'invert', src: 'vendor/asteroids-infinity/index.html', ar: '4 / 5', vw: 520, labels: { up: 'Thrust', down: 'Brake', a: 'Fire', b: 'Shield' }, keys: { ...dirs, a: K.space, b: K.ctrl, start: K.enter } },
+  yanoid:   { title: 'Yanoid',            lcd: 'invert', src: 'vendor/yanoid/index.html',             ar: '3 / 4', vw: 520, labels: { up: null, down: null, a: 'Fire', b: 'Pause' }, keys: { left: K.left, right: K.right, a: K.space, b: K.esc, start: { click: '#startBtn' } } },
+  invaders: { title: 'Space Invaders',    lcd: 'invert', src: 'vendor/html5-space-invaders/index.html', ar: '4 / 5', vw: 640, labels: { up: null, down: null, a: 'Fire', b: 'Enter' }, keys: { left: K.left, right: K.right, a: K.space, b: K.enter, start: K.one } },
+  snake:    { title: 'Snake',             lcd: 'light', src: 'vendor/html5-snake/index.html',        ar: '5 / 2', vw: 720, labels: { a: 'Start', b: null }, keys: { ...dirs, a: K.enter, b: K.enter, start: K.enter } },
 };
 const id = new URLSearchParams(location.search).get('g');
 const g = GAMES[id];
@@ -44,7 +47,7 @@ else {
   const [w, h] = g.ar.split('/').map(Number);
   const { cv } = Arcade.mount({ title: g.title, W: w * 100, H: h * 100, labels: g.labels });
   const frame = document.createElement('iframe');
-  frame.src = g.src; frame.title = g.title;
+  frame.src = g.src; frame.title = g.title; frame.className = 'lcd-' + g.lcd;
   frame.style.width = g.vw + 'px'; frame.style.height = (g.vw * h / w) + 'px';
   cv.replaceWith(frame);
   frame.style.touchAction = 'manipulation';

@@ -31,7 +31,7 @@ Breakout, Blocks and Side Shooter are written from scratch (vanilla JS + Canvas)
 
 1. Add `games/<name>.html` (copy an existing game; `Arcade.mount()` from `games/common.js` builds the console, `Arcade.held` and `Arcade.on()` give you the buttons). To embed an existing web game instead, put it in `games/vendor/<name>/` (keeping its license), add it to `GAMES` in `games/play.html` with a key mapping, and list it in `THIRD_PARTY.md`.
 2. Add the game to `GAMES` in `index.html`.
-3. Add the file to `ASSETS` in `sw.js` and bump `CACHE` (e.g. `retro-arcade-v7`), otherwise existing installs will not receive the update.
+3. Add the file to `ASSETS` in `sw.js` and bump `CACHE` (e.g. `retro-arcade-v8`), otherwise existing installs will not receive the update.
 
 ## Running locally
 

@@ -13,9 +13,10 @@
 const W = 360, H = 540, ID = 'breakout';
 const { ctx } = Arcade.mount({ title: 'Breakout', W, H, labels: { up: null, down: null, a: 'Launch', b: null } });
 const held = Arcade.held;
+const INK = Arcade.ink, MID = Arcade.mid, LCD = Arcade.lcd;
 
 const COLS = 8, ROWS = 6, BW = W / COLS, BH = 20, TOP = 50;
-const COLORS = ['#ff4081','#ff9100','#ffeb3b','#39ff88','#40c4ff','#b388ff'];
+const COLORS = [INK, MID, INK, MID, INK, MID];
 let paddle, ball, bricks, score, lives, state; // ready | play | paused | over | won
 
 function reset() {
@@ -81,15 +82,15 @@ function draw() {
   for (const b of bricks) if (b.alive) {
     ctx.fillStyle = COLORS[b.r]; ctx.fillRect(b.c * BW + 1, TOP + b.r * BH + 1, BW - 2, BH - 2);
   }
-  ctx.fillStyle = '#39ff88'; ctx.fillRect(paddle.x - paddle.w / 2, paddle.y, paddle.w, paddle.h);
-  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, 7); ctx.fill();
-  text('SCORE ' + score, 10, 30, 16, '#39ff88', 'left');
-  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 30, 16, '#8f8fb8');
-  text('♥'.repeat(lives), W - 10, 30, 16, '#ff4081', 'right');
-  if (state === 'ready') text('Press A to launch', W / 2, H / 2 + 60, 18, '#fff');
-  if (state === 'paused') text('PAUSED', W / 2, H / 2, 28, '#fff');
-  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Press A to play again', W / 2, H / 2 + 30, 16, '#fff'); }
-  if (state === 'won') { text('YOU WIN!', W / 2, H / 2, 28, '#39ff88'); text('Press A to play again', W / 2, H / 2 + 30, 16, '#fff'); }
+  ctx.fillStyle = INK; ctx.fillRect(paddle.x - paddle.w / 2, paddle.y, paddle.w, paddle.h);
+  ctx.fillStyle = INK; ctx.fillRect(ball.x - ball.r, ball.y - ball.r, ball.r * 2, ball.r * 2);
+  text('SCORE ' + score, 10, 30, 16, INK, 'left');
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 30, 16, MID);
+  text('♥'.repeat(lives), W - 10, 30, 16, INK, 'right');
+  if (state === 'ready') text('Press A to launch', W / 2, H / 2 + 60, 18, INK);
+  if (state === 'paused') text('PAUSED', W / 2, H / 2, 28, INK);
+  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, INK); text('Press A to play again', W / 2, H / 2 + 30, 16, INK); }
+  if (state === 'won') { text('YOU WIN!', W / 2, H / 2, 28, INK); text('Press A to play again', W / 2, H / 2 + 30, 16, INK); }
 }
 
 let last = performance.now();

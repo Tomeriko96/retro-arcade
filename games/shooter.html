@@ -14,6 +14,7 @@
 const W = 540, H = 320, ID = 'shooter';
 const { ctx } = Arcade.mount({ title: 'Side Shooter', W, H, labels: { a: 'Fire', b: null } });
 const held = Arcade.held;
+const INK = Arcade.ink, MID = Arcade.mid, LCD = Arcade.lcd;
 
 let ship, bullets, enemies, stars, score, lives, state, spawnT, fireT, t0; // ready | play | paused | over
 
@@ -73,23 +74,23 @@ function text(t, x, y, size, color, align) {
 }
 function draw() {
   ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#556';
+  ctx.fillStyle = MID;
   for (const s of stars) ctx.fillRect(s.x, s.y, 2, 2);
   if (ship.inv <= 0 || Math.floor(ship.inv * 10) % 2) {
-    ctx.fillStyle = '#39ff88';
+    ctx.fillStyle = INK;
     ctx.beginPath(); ctx.moveTo(ship.x + 14, ship.y); ctx.lineTo(ship.x - 12, ship.y - 8); ctx.lineTo(ship.x - 12, ship.y + 8); ctx.fill();
   }
-  ctx.fillStyle = '#fff'; for (const b of bullets) ctx.fillRect(b.x - b.w / 2, b.y - 1, b.w, b.h);
-  ctx.fillStyle = '#ff4081';
+  ctx.fillStyle = INK; for (const b of bullets) ctx.fillRect(b.x - b.w / 2, b.y - 1, b.w, b.h);
+  ctx.fillStyle = INK;
   for (const e of enemies) {
     ctx.beginPath(); ctx.moveTo(e.x - 11, e.y); ctx.lineTo(e.x + 11, e.y - 8); ctx.lineTo(e.x + 11, e.y + 8); ctx.fill();
   }
-  text('SCORE ' + score, 10, 22, 14, '#39ff88', 'left');
-  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 22, 14, '#8f8fb8');
-  text('♥'.repeat(Math.max(0, lives)), W - 10, 22, 14, '#ff4081', 'right');
-  if (state === 'ready') { text('D-pad to move, hold A to fire', W / 2, H / 2, 15, '#fff'); text('Press A to start', W / 2, H / 2 + 24, 15, '#39ff88'); }
-  if (state === 'paused') text('PAUSED', W / 2, H / 2, 28, '#fff');
-  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, '#ff4081'); text('Press A to play again', W / 2, H / 2 + 28, 15, '#fff'); }
+  text('SCORE ' + score, 10, 22, 14, INK, 'left');
+  text('HI ' + Math.max(Arcade.hi(ID), score), W / 2, 22, 14, MID);
+  text('♥'.repeat(Math.max(0, lives)), W - 10, 22, 14, INK, 'right');
+  if (state === 'ready') { text('D-pad to move, hold A to fire', W / 2, H / 2, 15, INK); text('Press A to start', W / 2, H / 2 + 24, 15, INK); }
+  if (state === 'paused') text('PAUSED', W / 2, H / 2, 28, INK);
+  if (state === 'over') { text('GAME OVER', W / 2, H / 2, 28, INK); text('Press A to play again', W / 2, H / 2 + 28, 15, INK); }
 }
 
 let last = performance.now();

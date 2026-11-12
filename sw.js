@@ -1,4 +1,4 @@
-const CACHE = 'retro-arcade-v6';
+const CACHE = 'retro-arcade-v7';
 const ASSETS = [
   './', './index.html', './style.css', './manifest.webmanifest',
   './games/common.js', './games/nozoom.js', './games/console.css',

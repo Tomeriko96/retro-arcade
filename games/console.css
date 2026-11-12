@@ -1,7 +1,7 @@
 /* Brick-game handheld: yellow body, black bezel, round blue buttons in a diamond (left/right/rotate/down),
    big blue action button, small green/red buttons. Laid out after chvin/react-tetris' controls. */
 :root { --page:#009688; --body:#f2cb1c; --body-edge:#c9a21a; --ink:#1a1a1a; --blue:#5b66f2; --blue-dk:#3b44c4;
-  --green:#2fc12f; --red:#e0141c; }
+  --green:#2fc12f; --red:#e0141c; --lcd:#9ead86; --ink:#1b2210; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin:0; min-height:100%; background:var(--page); color:var(--ink);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -19,7 +19,7 @@ body { display:flex; justify-content:center; min-height:100vh; min-height:100dvh
 .screen { grid-area:screen; justify-self:center; aspect-ratio: var(--ar); position:relative;
   width: min(100%, calc((100vh - 380px) * var(--ar)));
   width: min(100%, calc((100dvh - 380px) * var(--ar)));
-  background:#0b0b1a; border:5px solid #000; border-radius:4px; overflow:hidden;
+  background:var(--lcd); isolation:isolate; border:5px solid #000; border-radius:4px; overflow:hidden;
   box-shadow: 0 0 0 4px var(--body), 0 0 0 7px #000; margin:6px 0; }
 .screen canvas { display:block; width:100%; height:100%; }
 
