@@ -12,4 +12,5 @@ jobs:
         with:
           node-version: 22
       # Fails if sw.js lists a missing file, or the cache name is stale after editing a precached file.
+      - run: node tools/gen-pages.mjs --check
       - run: node tools/sw-cache.mjs

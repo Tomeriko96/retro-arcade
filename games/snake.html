@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Snake – Retro Arcade</title>
+<meta name="description" content="Eat, grow, do not hit yourself. Free, offline, no account.">
+<link rel="canonical" href="https://tomeriko96.github.io/retro-arcade/games/snake.html">
+<meta name="theme-color" content="#f2cb1c">
+<meta name="application-name" content="Retro Arcade">
+<meta name="apple-mobile-web-app-title" content="Retro Arcade">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Retro Arcade">
+<meta property="og:title" content="Snake – Retro Arcade">
+<meta property="og:url" content="https://tomeriko96.github.io/retro-arcade/games/snake.html">
+<meta property="og:description" content="Eat, grow, do not hit yourself. Free, offline, no account.">
+<meta property="og:image" content="https://tomeriko96.github.io/retro-arcade/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Retro Arcade: a yellow handheld console with the text 10 classic games, installable, offline, no account.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Snake – Retro Arcade">
+<meta name="twitter:description" content="Eat, grow, do not hit yourself. Free, offline, no account.">
+<meta name="twitter:image" content="https://tomeriko96.github.io/retro-arcade/og.png">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="stylesheet" href="console.css">
+<style>
+  .screen { position:relative; }
+  .screen iframe { position:absolute; left:0; top:0; border:0; transform-origin:0 0; mix-blend-mode:multiply; }
+  /* Same LCD look as our own games: grayscale the page, then multiply it onto the green screen. Dark pages are inverted first. */
+  .screen iframe.lcd-light  { filter: grayscale(1) contrast(1.35); }
+  .screen iframe.lcd-invert { filter: grayscale(1) contrast(1.35) invert(1); }
+  /* Games whose colors matter keep their own look. */
+  .screen iframe.lcd-none   { mix-blend-mode:normal; background:#fff; }
+</style>
+</head>
+<body>
+<script>window.ARCADE_GAME = 'snake';</script>
+<script src="nozoom.js"></script>
+<script src="common.js"></script>
+<script src="play.js"></script>
+</body>
+</html>

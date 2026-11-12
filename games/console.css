@@ -53,7 +53,7 @@ button { font:inherit; touch-action:none; }
 .diamond .u { grid-column:2; grid-row:1; } .diamond .l { grid-column:1; grid-row:2; }
 .diamond .r { grid-column:3; grid-row:2; } .diamond .d { grid-column:2; grid-row:3; }
 .diamond .btn .cap { position:absolute; top:100%; left:50%; transform:translateX(-50%); margin:0; }
-.diamond .u .cap { top:8px; left:auto; right:calc(100% + 4px); transform:none; text-align:right; }
+.diamond .u .cap { top:8px; left:calc(100% + 4px); right:auto; transform:none; text-align:left; } /* in the empty cell beside Up, clear of the small buttons */
 .diamond .mark { grid-column:2; grid-row:2; display:grid; place-items:center; font-size:12px; line-height:1;
   grid-template-areas:". u ." "l . r" ". d ."; }
 .mark i { font-style:normal; } .mark .mu{grid-area:u} .mark .ml{grid-area:l} .mark .mr{grid-area:r} .mark .md{grid-area:d}
@@ -125,3 +125,8 @@ button { font:inherit; touch-action:none; }
 .toast { position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); z-index:20; max-width:90vw;
   padding:8px 14px; border-radius:8px; background:var(--ink); color:var(--lcd); font-size:13px; font-weight:600; opacity:0; pointer-events:none; transition:opacity .15s; }
 .toast.show { opacity:1; }
+
+/* Captions and the diamond's empty cells must never swallow taps meant for the buttons beside them (320px phones). */
+.btn .cap { pointer-events:none; }
+.diamond { pointer-events:none; }
+.diamond .btn button { pointer-events:auto; }

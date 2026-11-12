@@ -30,9 +30,9 @@ Breakout, Blocks, Space Rocks and Side Shooter are written from scratch (vanilla
 
 ## Adding a game
 
-1. Add `games/<name>.html` (copy an existing game; `Arcade.mount()` from `games/common.js` builds the console, `Arcade.held` and `Arcade.on()` give you the buttons). To embed an existing web game instead, put it in `games/vendor/<name>/` (keeping its license), add it to `GAMES` in `games/play.html` with a key mapping, and list it in `THIRD_PARTY.md`. If you change any vendored file, add a line under "What we changed" there.
+1. Add `games/<name>.html` (copy an existing game; `Arcade.mount()` from `games/common.js` builds the console, `Arcade.held` and `Arcade.on()` give you the buttons). To embed an existing web game instead, put it in `games/vendor/<name>/` (keeping its license), add it to `GAMES` in `games/play.js` with a key mapping and to the table in `tools/gen-pages.mjs`, run `node tools/gen-pages.mjs` (writes its own static page with title, canonical and social card), and list it in `THIRD_PARTY.md`. If you change any vendored file, add a line under "What we changed" there.
 2. Add a card to the grid in `index.html` (plain HTML, so the launcher works without JS). Add `data-id` and a reader in the `HI` map if the game keeps a high score.
-3. Add the files to `CORE` (own games) or `VENDOR` (third-party, cached best-effort) in `sw.js`, then run `node tools/sw-cache.mjs --write`. It checks that every listed file exists and sets `CACHE` to a hash of their contents, so existing installs receive the update. CI (`.github/workflows/check-sw.yml`) fails if you forget.
+3. Add the files (and the generated page) to `CORE` (own games, pages) or `VENDOR` (third-party, cached best-effort) in `sw.js`, then run `node tools/sw-cache.mjs --write`. It checks that every listed file exists and sets `CACHE` to a hash of their contents, so existing installs receive the update. CI (`.github/workflows/check-sw.yml`) fails if you forget.
 
 ## Running locally
 

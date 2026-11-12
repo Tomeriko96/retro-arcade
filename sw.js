@@ -1,9 +1,9 @@
-const CACHE = 'retro-arcade-e57a46cf6e';
+const CACHE = 'retro-arcade-56722eabf3';
 // Must all succeed: the launcher, our own games and the licence texts. If one fails the install is retried.
 const CORE = [
   './', './index.html', './offline.html', './style.css', './manifest.webmanifest',
-  './pwa.js', './games/common.js', './games/nozoom.js', './games/console.css',
-  './games/breakout.html', './games/shooter.html', './games/blocks.html', './games/rocks.html', './games/play.html',
+  './pwa.js', './games/common.js', './games/play.js', './icons/maskable-192.png', './games/nozoom.js', './games/console.css',
+  './games/breakout.html', './games/netris.html', './games/hextris.html', './games/asteroids.html', './games/yanoid.html', './games/invaders.html', './games/snake.html', './games/shooter.html', './games/blocks.html', './games/rocks.html', './games/play.html',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
   './LICENSE', './THIRD_PARTY.md',
   './games/vendor/netris/UPSTREAM-LICENSE', './games/vendor/netris/UPSTREAM-THIRD_PARTY_NOTICES.md', './games/vendor/netris/UPSTREAM-PROVENANCE.md',
@@ -134,9 +134,12 @@ self.addEventListener('message', (e) => {
   if (e.data !== 'warm') return;
   const client = e.source;
   e.waitUntil(caches.open(CACHE).then(async (c) => {
-    const results = await Promise.allSettled(VENDOR.map(async (u) => { if (!(await c.match(u))) await c.add(u); }));
-    // Tell the page how it went, so it can say whether offline play is ready (see pwa.js). Failures are retried on the next visit.
-    if (client) client.postMessage({ type: 'warm-done', total: VENDOR.length, failed: results.filter((r) => r.status === 'rejected').length });
+    await Promise.allSettled(VENDOR.map(async (u) => { if (!(await c.match(u))) await c.add(u); }));
+    // Do not trust the fetch results alone: count what the cache really holds, then tell the page (see pwa.js).
+    // Anything missing is retried on the next visit.
+    const held = new Set((await c.keys()).map((r) => new URL(r.url).pathname));
+    const failed = VENDOR.filter((u) => !held.has(new URL(u, self.registration.scope).pathname)).length;
+    if (client) client.postMessage({ type: 'warm-done', total: VENDOR.length, failed });
   }));
 });
 

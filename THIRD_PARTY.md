@@ -30,7 +30,7 @@ folder (`LICENSE`, `CREDITS.md`, `LICENSE.md`, `UPSTREAM-*`).
   hide vendor menus that duplicate the console, and repaints Snake's start screen; those are integration code in
   this repository, not edits to the vendored files. The same goes for the accessibility fixes it applies to the
   loaded vendor pages (page language, a main landmark, a hidden heading, alt text on Hextris' icon buttons) and
-  for discarding an unreadable Hextris save before the game boots.
+  for discarding an unreadable Hextris save before the game boots. Hextris' own `<meta name="viewport">` (`user-scalable=0`) is left as upstream: browsers ignore a viewport meta inside an iframe, so it does not restrict zoom here (axe still lists it when it audits the vendored page on its own).
 
 **Rule:** every edit to a file under `games/vendor/` must add a line to this list.
 
