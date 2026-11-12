@@ -152,17 +152,14 @@ function initialize(a) {
 			e.preventDefault();
 		}, false);
 		$(window).resize(scaleCanvas);
-		// Local modification: ".unload(fn)" as an event-binding shorthand was removed in jQuery
-		// 3.0 (present, if deprecated, in the 1.9.1 this game was written against) — matters here
-		// because the Camila-hosted tab reuses Camila's own already-loaded jQuery 3.7.1 instead of
-		// this game's vendored 1.9.1 (see ../../dashboard-hextris.inc.php's own comment on why: a
-		// second jQuery load would clobber Camila's page-wide jQuery + its x-editable plugin).
-		// ".on('unload', fn)" is the direct modern equivalent, works identically either way.
-		$(window).on('unload', function() {
-
+		// Local modification: save on "pagehide"/"visibilitychange" instead of "unload". Chromium blocks
+		// unload handlers (Permissions-Policy violation, handler never runs), so the saved game was never written.
+		var persistState = function() {
 			if (gameState == 1 || gameState == -1 || gameState === 0) localStorage.setItem("saveState", exportSaveState());
 			else localStorage.setItem("saveState", "{}");
-		});
+		};
+		$(window).on('pagehide', persistState);
+		document.addEventListener('visibilitychange', function() { if (document.hidden) persistState(); });
 
 		addKeyListeners();
 		// Local modification: upstream loads Google Analytics here (remote script fetch +

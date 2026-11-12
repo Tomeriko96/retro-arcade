@@ -13,7 +13,7 @@ body { display:flex; justify-content:center; min-height:100vh; min-height:100dvh
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: "top top" "screen screen" "left right" "hint hint"; }
 .top { grid-area:top; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:600; }
-.top a { color:var(--ink); text-decoration:none; }
+.top a { color:var(--ink); text-decoration:none; padding:15px 12px; margin:-15px -12px; }
 .top span { letter-spacing:.3em; text-transform:uppercase; }
 
 .screen { grid-area:screen; justify-self:center; aspect-ratio: var(--ar); position:relative;
@@ -72,7 +72,8 @@ button { font:inherit; touch-action:none; }
 /* Header toggle + keyboard legend (legend is only shown in desktop view) */
 .top { gap:8px; }
 .top span { flex:1; text-align:center; }
-.ui-toggle { font-size:11px; font-weight:600; color:var(--ink); background:transparent; border:2px solid var(--ink); border-radius:12px; padding:2px 8px; cursor:pointer; }
+.ui-toggle { font-size:11px; font-weight:600; color:var(--ink); background:transparent; border:2px solid var(--ink); border-radius:12px; padding:2px 8px; cursor:pointer; position:relative; }
+.ui-toggle::after { content:""; position:absolute; inset:-12px -4px; }
 .legend { display:none; }
 
 /* Desktop: the game fills the window and is played with the keyboard. The header and key list only

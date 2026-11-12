@@ -22,7 +22,9 @@ window.Arcade = (() => {
 
   addEventListener('keydown', (e) => {
     const n = KEYS[e.key.toLowerCase()];
-    if (!n) return;
+    if (!n || e.ctrlKey || e.metaKey || e.altKey) return;
+    // Enter/Space on a focused link/button must keep their native activation.
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('a,button,input,select,textarea,[role=button]')) return;
     e.preventDefault();
     if (!e.repeat) press(n);
   });
@@ -35,6 +37,8 @@ window.Arcade = (() => {
     (views[name] = views[name] || []).push(el);
     el.addEventListener('pointerdown', (e) => { e.preventDefault(); el.setPointerCapture(e.pointerId); press(name); });
     for (const t of ['pointerup', 'pointercancel']) el.addEventListener(t, () => release(name));
+    // Keyboard activation (Enter/Space on a focused button) arrives as a click with detail 0.
+    el.addEventListener('click', (e) => { if (e.detail === 0) { press(name); setTimeout(() => release(name), 80); } });
   }
 
   // Touch phones get the handheld with on-screen buttons; computers get a big screen and the keyboard.
@@ -99,6 +103,9 @@ window.Arcade = (() => {
     cv.width = W; cv.height = H;
     return { cv, ctx: cv.getContext('2d'), wake };
   }
+
+  // Offline support must not depend on entering through the launcher (deep links, installed-app launches).
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(() => {});
 
   return {
     held, mount,

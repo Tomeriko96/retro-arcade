@@ -1,5 +1,5 @@
 /* Launcher in the same theme as the games: yellow handheld body, black bezel, LCD-green tiles. */
-:root { --page:#009688; --body:#f2cb1c; --body-edge:#c9a21a; --ink:#1b2210; --mid:#5e6b47; --lcd:#9ead86; }
+:root { --page:#009688; --body:#f2cb1c; --body-edge:#c9a21a; --ink:#1b2210; --mid:#333c28; --lcd:#9ead86; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { touch-action: manipulation; margin:0; background:var(--page); color:var(--ink);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -18,7 +18,7 @@ p.sub { text-align:center; margin:0 0 16px; font-size:.85rem; color:#5a4a08; }
 .card p { margin:0 0 8px; color:var(--mid); font-size:.8rem; min-height:2.4em; }
 .card .hi { color:var(--ink); font-size:.75rem; font-weight:700; }
 footer { margin-top:22px; text-align:center; color:#5a4a08; font-size:.75rem; }
-footer a { color:inherit; }
+footer a { color:inherit; display:inline-block; padding:15px 8px; margin:-15px -8px; }
 
 /* Computers: wider launcher */
 @media (min-width: 760px) {
