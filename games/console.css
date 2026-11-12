@@ -1,0 +1,54 @@
+/* Game Boy-style console: screen on top, D-pad / A / B / Start / Select below. */
+:root { --bg:#111122; --body:#2b2b4d; --body-hi:#3a3a66; --fg:#39ff88; --ac:#ff4081; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin:0; min-height:100%; background:var(--bg); color:var(--fg);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  overscroll-behavior: none; touch-action: none; user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none; }
+body { display:flex; justify-content:center; min-height:100vh; min-height:100dvh; }
+
+.gb { display:grid; gap:10px; padding:10px; width:min(100vw, 520px); align-content:center;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "top top" "screen screen" "dpad ab" "mid mid" "hint hint"; }
+.top { grid-area:top; display:flex; justify-content:space-between; font-size:13px; }
+.top a { color:var(--fg); text-decoration:none; }
+.top span { color:#8f8fb8; }
+
+.screen { grid-area:screen; justify-self:center; aspect-ratio: var(--ar);
+  width: min(100%, calc((100vh - 330px) * var(--ar)));
+  width: min(100%, calc((100dvh - 330px) * var(--ar)));
+  background:#0b0b1a; border:3px solid var(--body-hi); border-radius:10px; overflow:hidden; }
+.screen canvas { display:block; width:100%; height:100%; }
+
+.pad { display:contents; }
+.dpad { grid-area:dpad; justify-self:center; align-self:center; position:relative; width:132px; height:132px; touch-action:none; }
+.dpad i { position:absolute; background:var(--body); border:2px solid var(--body-hi); }
+.dpad .u { left:44px; top:0; width:44px; height:48px; border-radius:8px 8px 0 0; }
+.dpad .d { left:44px; bottom:0; width:44px; height:48px; border-radius:0 0 8px 8px; }
+.dpad .l { left:0; top:44px; width:48px; height:44px; border-radius:8px 0 0 8px; }
+.dpad .r { right:0; top:44px; width:48px; height:44px; border-radius:0 8px 8px 0; }
+.dpad .c { left:44px; top:44px; width:44px; height:44px; }
+.dpad i.on { background:var(--fg); border-color:var(--fg); }
+
+.ab { grid-area:ab; justify-self:center; align-self:center; position:relative; width:140px; height:100px; }
+.ab button { position:absolute; width:62px; height:62px; border-radius:50%; border:3px solid var(--ac);
+  background:var(--body); color:var(--ac); font:bold 18px ui-monospace, monospace; touch-action:none; }
+.ab [data-k=b] { left:0; top:36px; }
+.ab [data-k=a] { right:0; top:0; }
+.ab button.on, .mid button.on { background:var(--ac); color:#111122; }
+
+.mid { grid-area:mid; display:flex; gap:18px; justify-content:center; }
+.mid button { padding:8px 14px; border-radius:14px; border:2px solid #8f8fb8; background:var(--body);
+  color:#8f8fb8; font:bold 11px ui-monospace, monospace; letter-spacing:.08em; touch-action:none; }
+.mid button.on { border-color:var(--ac); }
+
+.hint { grid-area:hint; margin:0; text-align:center; font-size:11px; color:#6a6a92; }
+@media (hover: none) { .hint { display:none; } }
+
+/* Short landscape screens (phone on its side): D-pad left, screen middle, A/B right. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .gb { width:100vw; grid-template-columns: auto 1fr auto; align-content:stretch;
+    grid-template-areas: "top top top" "dpad screen ab" "dpad mid ab"; }
+  .screen { width:auto; height: calc(100vh - 80px); height: calc(100dvh - 80px); max-width:100%; }
+  .hint { display:none; }
+}

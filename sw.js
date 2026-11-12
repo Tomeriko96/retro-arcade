@@ -1,7 +1,8 @@
-const CACHE = 'retro-arcade-v2';
+const CACHE = 'retro-arcade-v3';
 const ASSETS = [
   './', './index.html', './style.css', './manifest.webmanifest',
-  './games/common.js', './games/breakout.html', './games/shooter.html',
+  './games/common.js', './games/console.css',
+  './games/breakout.html', './games/shooter.html', './games/blocks.html',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
 ];
 

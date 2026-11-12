@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Blocks</title>
+<link rel="stylesheet" href="console.css">
+</head>
+<body>
+<script src="common.js"></script>
+<script>
+// Left/Right move (hold to repeat), Down soft-drops, A or Up rotates, B hard-drops, Start pauses.
+const COLS = 10, ROWS = 20, C = 16, BX = 4;
+const W = 240, H = ROWS * C, ID = 'blocks';
+const { ctx } = Arcade.mount({ title: 'Blocks', W, H });
+const held = Arcade.held;
+
+const SHAPES = {
+  I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
+  O: [[1,1],[1,1]],
+  T: [[0,1,0],[1,1,1],[0,0,0]],
+  S: [[0,1,1],[1,1,0],[0,0,0]],
+  Z: [[1,1,0],[0,1,1],[0,0,0]],
+  J: [[1,0,0],[1,1,1],[0,0,0]],
+  L: [[0,0,1],[1,1,1],[0,0,0]],
+};
+const COLORS = { I:'#40c4ff', O:'#ffeb3b', T:'#b388ff', S:'#39ff88', Z:'#ff4081', J:'#5c6bff', L:'#ff9100' };
+
+let grid, cur, next, bag, score, lines, level, state, fall, dir, das; // state: ready | play | paused | over
+
+function newBag() {
+  const b = Object.keys(SHAPES);
+  for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }
+  return b;
+}
+function draw7() { if (!bag.length) bag = newBag(); return bag.pop(); }
+function makePiece(k) { const m = SHAPES[k].map((r) => r.slice()); return { k, m, x: Math.floor((COLS - m.length) / 2), y: 0 }; }
+function rotate(m) { const n = m.length; return m.map((_, y) => m.map((__, x) => m[n - 1 - x][y])); }
+
+function collides(m, px, py) {
+  for (let y = 0; y < m.length; y++) for (let x = 0; x < m.length; x++) {
+    if (!m[y][x]) continue;
+    const gx = px + x, gy = py + y;
+    if (gx < 0 || gx >= COLS || gy >= ROWS) return true;
+    if (gy >= 0 && grid[gy][gx]) return true;
+  }
+  return false;
+}
+
+function reset() {
+  grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  bag = []; score = 0; lines = 0; level = 1; fall = 0; dir = 0; das = 0;
+  cur = makePiece(draw7()); next = draw7(); state = 'ready';
+}
+function spawn() {
+  cur = makePiece(next); next = draw7();
+  if (collides(cur.m, cur.x, cur.y)) { state = 'over'; Arcade.saveHi(ID, score); }
+}
+function lock() {
+  cur.m.forEach((row, y) => row.forEach((v, x) => { if (v && cur.y + y >= 0) grid[cur.y + y][cur.x + x] = cur.k; }));
+  let n = 0;
+  for (let y = ROWS - 1; y >= 0; y--) if (grid[y].every(Boolean)) { grid.splice(y, 1); grid.unshift(Array(COLS).fill(null)); n++; y++; }
+  if (n) { score += [0, 100, 300, 500, 800][n] * level; lines += n; level = 1 + Math.floor(lines / 10); }
+  spawn();
+}
+function tryMove(dx, dy) {
+  if (collides(cur.m, cur.x + dx, cur.y + dy)) return false;
+  cur.x += dx; cur.y += dy; return true;
+}
+function tryRotate() {
+  const m = rotate(cur.m);
+  for (const k of [0, -1, 1, -2, 2]) if (!collides(m, cur.x + k, cur.y)) { cur.m = m; cur.x += k; return; }
+}
+function hardDrop() { let n = 0; while (tryMove(0, 1)) n++; score += 2 * n; lock(); fall = 0; }
+
+function begin() { if (state === 'ready') state = 'play'; else if (state === 'over') reset(); }
+function onRotate() { if (state === 'play') tryRotate(); else begin(); }
+Arcade.on('a', onRotate);
+Arcade.on('up', () => { if (state === 'play') tryRotate(); });
+Arcade.on('b', () => { if (state === 'play') hardDrop(); });
+Arcade.on('start', () => {
+  if (state === 'play') state = 'paused';
+  else if (state === 'paused') state = 'play';
+  else begin();
+});
+
+function update(dt) {
+  if (state !== 'play') return;
+  const d = (held.right ? 1 : 0) - (held.left ? 1 : 0);
+  if (d !== dir) { dir = d; das = 0; if (d) tryMove(d, 0); }
+  else if (d) { das += dt; if (das >= 0.17) { tryMove(d, 0); das = 0.12; } }
+
+  const interval = held.down ? 0.04 : Math.max(0.07, 0.8 - (level - 1) * 0.07);
+  fall += dt;
+  while (fall >= interval && state === 'play') {
+    fall -= interval;
+    if (tryMove(0, 1)) { if (held.down) score += 1; } else { lock(); fall = 0; break; }
+  }
+}
+
+function text(t, x, y, size, color, align) {
+  ctx.fillStyle = color; ctx.font = `bold ${size}px ui-monospace, monospace`; ctx.textAlign = align || 'center';
+  ctx.fillText(t, x, y);
+}
+function cell(px, py, color) {
+  ctx.fillStyle = color; ctx.fillRect(px + 1, py + 1, C - 2, C - 2);
+  ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fillRect(px + 1, py + 1, C - 2, 3);
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = '#2b2b4d'; ctx.strokeRect(BX - 1.5, 0.5, COLS * C + 3, H - 1);
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (grid[y][x]) cell(BX + x * C, y * C, COLORS[grid[y][x]]);
+  if (state !== 'over') {
+    let gy = cur.y; while (!collides(cur.m, cur.x, gy + 1)) gy++;
+    ctx.strokeStyle = COLORS[cur.k]; ctx.globalAlpha = .4;
+    cur.m.forEach((row, y) => row.forEach((v, x) => { if (v) ctx.strokeRect(BX + (cur.x + x) * C + 1.5, (gy + y) * C + 1.5, C - 3, C - 3); }));
+    ctx.globalAlpha = 1;
+    cur.m.forEach((row, y) => row.forEach((v, x) => { if (v && cur.y + y >= 0) cell(BX + (cur.x + x) * C, (cur.y + y) * C, COLORS[cur.k]); }));
+  }
+  const px = BX + COLS * C + 14;
+  text('NEXT', px, 20, 11, '#8f8fb8', 'left');
+  const nm = SHAPES[next];
+  nm.forEach((row, y) => row.forEach((v, x) => { if (v) cell(px + x * 12 - 0, 28 + y * 12, COLORS[next]); }));
+  text('SCORE', px, 110, 11, '#8f8fb8', 'left'); text(String(score), px, 126, 14, '#39ff88', 'left');
+  text('LEVEL', px, 154, 11, '#8f8fb8', 'left'); text(String(level), px, 170, 14, '#39ff88', 'left');
+  text('LINES', px, 198, 11, '#8f8fb8', 'left'); text(String(lines), px, 214, 14, '#39ff88', 'left');
+  text('HI', px, 242, 11, '#8f8fb8', 'left'); text(String(Math.max(Arcade.hi(ID), score)), px, 258, 14, '#ff4081', 'left');
+  if (state === 'ready') { ctx.fillStyle = 'rgba(11,11,26,.8)'; ctx.fillRect(BX, 120, COLS * C, 70); text('Press A', BX + COLS * C / 2, 150, 16, '#fff'); text('to start', BX + COLS * C / 2, 172, 16, '#fff'); }
+  if (state === 'paused') { ctx.fillStyle = 'rgba(11,11,26,.8)'; ctx.fillRect(BX, 130, COLS * C, 50); text('PAUSED', BX + COLS * C / 2, 162, 18, '#fff'); }
+  if (state === 'over') { ctx.fillStyle = 'rgba(11,11,26,.85)'; ctx.fillRect(BX, 110, COLS * C, 90); text('GAME OVER', BX + COLS * C / 2, 150, 16, '#ff4081'); text('Press A', BX + COLS * C / 2, 176, 14, '#fff'); }
+}
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.033, (now - last) / 1000); last = now;
+  update(dt); draw(); requestAnimationFrame(loop);
+}
+reset(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
