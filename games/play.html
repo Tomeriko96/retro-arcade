@@ -54,7 +54,12 @@ else {
   frame.style.width = g.vw + 'px'; frame.style.height = (g.vw * h / w) + 'px';
   cv.replaceWith(frame);
   frame.style.touchAction = 'manipulation';
-  frame.addEventListener('load', () => { window.noZoom(frame.contentWindow, false); window.focus(); try { frame.contentWindow.addEventListener('mousemove', wake); } catch (e) {} }); // keep the keyboard on the console so every key mapping works
+  frame.addEventListener('load', () => { window.noZoom(frame.contentWindow, false); window.focus(); try {
+      frame.contentWindow.addEventListener('mousemove', wake);
+      // Clicking inside the game would leave keyboard focus in the iframe and silently kill Esc/R/P and the
+      // console key mapping. Hand focus back to the console after every click; the console forwards keys itself.
+      frame.contentWindow.addEventListener('pointerup', () => setTimeout(() => { frame.blur(); window.focus(); }, 0));
+    } catch (e) {} }); // keep the keyboard on the console so every key mapping works
   const box = frame.parentElement;
   const fit = () => {
     const s = box.clientWidth / g.vw; // game is laid out g.vw wide, then scaled; height follows the screen so no strip is left over

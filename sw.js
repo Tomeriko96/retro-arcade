@@ -1,10 +1,21 @@
-const CACHE = 'retro-arcade-v12';
-const ASSETS = [
+const CACHE = 'retro-arcade-v13';
+// Must all succeed: the launcher, our own games and the licence texts. If one fails the install is retried.
+const CORE = [
   './', './index.html', './style.css', './manifest.webmanifest',
   './games/common.js', './games/nozoom.js', './games/console.css',
   './games/breakout.html', './games/shooter.html', './games/blocks.html', './games/rocks.html', './games/play.html',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
-  // Vendored third-party games (see THIRD_PARTY.md)
+  './LICENSE', './THIRD_PARTY.md',
+  './games/vendor/netris/UPSTREAM-LICENSE', './games/vendor/netris/UPSTREAM-THIRD_PARTY_NOTICES.md', './games/vendor/netris/UPSTREAM-PROVENANCE.md',
+  './games/vendor/hextris/CREDITS.md', './games/vendor/hextris/LICENSE.md', './games/vendor/hextris/UPSTREAM-LICENSE',
+  './games/vendor/asteroids-infinity/UPSTREAM-LICENSE', './games/vendor/asteroids-infinity/UPSTREAM-THIRD_PARTY_NOTICES.md', './games/vendor/asteroids-infinity/UPSTREAM-PROVENANCE.md',
+  './games/vendor/yanoid/UPSTREAM-LICENSE', './games/vendor/yanoid/UPSTREAM-THIRD_PARTY_NOTICES.md', './games/vendor/yanoid/UPSTREAM-PROVENANCE.md',
+  './games/vendor/html5-space-invaders/CREDITS.md', './games/vendor/html5-space-invaders/LICENSE', './games/vendor/html5-space-invaders/UPSTREAM-LICENSE',
+  './games/vendor/html5-snake/CREDITS.md', './games/vendor/html5-snake/LICENSE', './games/vendor/html5-snake/UPSTREAM-LICENSE',
+];
+// Vendored games: cached best-effort, so one flaky asset cannot stop the whole service worker from installing.
+// Anything missed is cached the first time it is fetched (see the fetch handler).
+const VENDOR = [
   './games/vendor/asteroids-infinity/index.html',
   './games/vendor/asteroids-infinity/src/app.js',
   './games/vendor/asteroids-infinity/src/asteroids.js',
@@ -138,14 +149,17 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(async (c) => {
+    await c.addAll(CORE);
+    await Promise.allSettled(VENDOR.map((u) => c.add(u)));
+  }).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
+      // No clients.claim(): claiming open pages blocks the back/forward cache. New versions take over on the next navigation.
   );
 });
 
@@ -160,7 +174,7 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put(e.request, copy));
         }
         return res;
-      }).catch(() => caches.match('./index.html'))
+      }).catch(() => (e.request.mode === 'navigate' ? caches.match('./index.html') : Response.error()))
     )
   );
 });

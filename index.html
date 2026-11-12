@@ -15,34 +15,27 @@
 <main>
   <h1>Retro Arcade</h1>
   <p class="sub">Classic mini-games. Installable, offline, no account.</p>
-  <div class="grid" id="grid"></div>
+  <div class="grid" id="grid">
+    <a class="card" href="games/breakout.html" data-id="breakout"><h2>Breakout</h2><p>Bounce the ball, break the bricks.</p><span class="hi"></span></a>
+    <a class="card" href="games/blocks.html" data-id="blocks"><h2>Blocks</h2><p>Stack falling blocks and clear lines.</p><span class="hi"></span></a>
+    <a class="card" href="games/rocks.html" data-id="rocks"><h2>Space Rocks</h2><p>Blast drifting asteroids before they hit you.</p><span class="hi"></span></a>
+    <a class="card" href="games/shooter.html" data-id="shooter"><h2>Side Shooter</h2><p>Shoot down enemies in a side-scrolling level.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=netris"><h2>Netris</h2><p>Falling blocks. Port of Netris 0.52.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=hextris"><h2>Hextris</h2><p>Match blocks around a spinning hexagon.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=asteroids"><h2>Asteroids Infinity</h2><p>Fly, shoot and survive the asteroid field.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=yanoid"><h2>Yanoid</h2><p>Arkanoid-style brick breaker with power-ups.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=invaders"><h2>Space Invaders</h2><p>Defend Earth from the descending invaders.</p><span class="hi"></span></a>
+    <a class="card" href="games/play.html?g=snake"><h2>Snake</h2><p>Eat, grow, do not hit yourself.</p><span class="hi"></span></a>
+  </div>
   <footer>High scores are stored on this device only.<br>GPL-3.0 &middot; <a href="https://github.com/Tomeriko96/retro-arcade/blob/main/THIRD_PARTY.md">game credits</a></footer>
 </main>
 <script src="games/nozoom.js"></script>
 <script>
-const GAMES = [
-  { id: 'breakout', title: 'Breakout', desc: 'Bounce the ball, break the bricks.', href: 'games/breakout.html' },
-  { id: 'blocks',   title: 'Blocks', desc: 'Stack falling blocks and clear lines.', href: 'games/blocks.html' },
-  { id: 'rocks',    title: 'Space Rocks', desc: 'Blast drifting asteroids before they hit you.', href: 'games/rocks.html' },
-  { id: 'shooter',  title: 'Side Shooter', desc: 'Shoot down enemies in a side-scrolling level.', href: 'games/shooter.html' },
-  { title: 'Netris',            desc: 'Falling blocks. Port of Netris 0.52.', href: 'games/play.html?g=netris' },
-  { title: 'Hextris',           desc: 'Match blocks around a spinning hexagon.', href: 'games/play.html?g=hextris' },
-  { title: 'Asteroids Infinity', desc: 'Fly, shoot and survive the asteroid field.', href: 'games/play.html?g=asteroids' },
-  { title: 'Yanoid',            desc: 'Arkanoid-style brick breaker with power-ups.', href: 'games/play.html?g=yanoid' },
-  { title: 'Space Invaders',    desc: 'Defend Earth from the descending invaders.', href: 'games/play.html?g=invaders' },
-  { title: 'Snake',             desc: 'Eat, grow, do not hit yourself.', href: 'games/play.html?g=snake' },
-];
-const grid = document.getElementById('grid');
-for (const g of GAMES) {
+// Cards are static HTML (they work without JS); JS only adds the high scores.
+for (const a of document.querySelectorAll('.card[data-id]')) {
   let hi = 0;
-  if (g.id) { try { hi = Number(localStorage.getItem('arcade:hi:' + g.id)) || 0; } catch (e) {} }
-  const a = document.createElement('a');
-  a.className = 'card'; a.href = g.href;
-  a.innerHTML = `<h2></h2><p></p><span class="hi"></span>`;
-  a.querySelector('h2').textContent = g.title;
-  a.querySelector('p').textContent = g.desc;
-  if (g.id) a.querySelector('.hi').textContent = 'High score: ' + hi;
-  grid.appendChild(a);
+  try { hi = Number(localStorage.getItem('arcade:hi:' + a.dataset.id)) || 0; } catch (e) {}
+  a.querySelector('.hi').textContent = 'High score: ' + hi;
 }
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
