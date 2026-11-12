@@ -68,3 +68,24 @@ button { font:inherit; touch-action:none; }
   .diamond .btn button { width:46px; height:46px; }
   .hint { display:none; }
 }
+
+/* Header toggle + keyboard legend (legend is only shown in desktop view) */
+.top { gap:8px; }
+.top span { flex:1; text-align:center; }
+.ui-toggle { font-size:11px; font-weight:600; color:var(--ink); background:transparent; border:2px solid var(--ink); border-radius:12px; padding:2px 8px; cursor:pointer; }
+.legend { display:none; }
+
+/* Desktop: no handheld, just a big screen with the keys listed underneath. */
+:root[data-ui=desktop] body { align-items:flex-start; }
+:root[data-ui=desktop] .gb { width:min(100vw, 1000px); background:transparent; box-shadow:none; border-radius:0; padding:14px 20px 20px;
+  grid-template-columns: 1fr; grid-template-areas: "top" "screen" "legend"; align-content:start; }
+:root[data-ui=desktop] .left, :root[data-ui=desktop] .right, :root[data-ui=desktop] .hint { display:none; }
+:root[data-ui=desktop] .top { color:#fff; } :root[data-ui=desktop] .top a { color:#fff; }
+:root[data-ui=desktop] .ui-toggle { color:#fff; border-color:#fff; }
+:root[data-ui=desktop] .screen { width:min(100%, calc((100vh - 200px) * var(--ar))); width:min(100%, calc((100dvh - 200px) * var(--ar))); margin:12px 0 4px; }
+:root[data-ui=desktop] .legend { display:block; grid-area:legend; justify-self:center; color:#fff; margin-top:10px; }
+.legend b { display:block; margin-bottom:6px; font-size:15px; letter-spacing:.1em; text-transform:uppercase; text-align:center; }
+.legend .rows { display:flex; flex-wrap:wrap; gap:8px 22px; justify-content:center; }
+.legend .row { white-space:nowrap; font-size:13px; }
+.legend kbd { display:inline-block; min-width:26px; padding:1px 7px; margin-right:6px; text-align:center; font:600 12px ui-monospace, monospace;
+  color:var(--ink); background:var(--body); border-radius:5px; box-shadow:0 2px 0 var(--body-edge); }

@@ -53,7 +53,7 @@ else {
   frame.style.width = g.vw + 'px'; frame.style.height = (g.vw * h / w) + 'px';
   cv.replaceWith(frame);
   frame.style.touchAction = 'manipulation';
-  frame.addEventListener('load', () => window.noZoom(frame.contentWindow, false));
+  frame.addEventListener('load', () => { window.noZoom(frame.contentWindow, false); window.focus(); }); // keep the keyboard on the console so every key mapping works
   const box = frame.parentElement;
   const fit = () => {
     const s = box.clientWidth / g.vw; // game is laid out g.vw wide, then scaled; height follows the screen so no strip is left over

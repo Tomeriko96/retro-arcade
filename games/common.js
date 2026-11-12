@@ -37,6 +37,17 @@ window.Arcade = (() => {
     for (const t of ['pointerup', 'pointercancel']) el.addEventListener(t, () => release(name));
   }
 
+  // Touch phones get the handheld with on-screen buttons; computers get a big screen and the keyboard.
+  // ?ui=handheld|desktop or the toggle in the top bar overrides the automatic choice (remembered per device).
+  function uiMode() {
+    const q = new URLSearchParams(location.search).get('ui');
+    if (q === 'handheld' || q === 'desktop') return q;
+    try { const s = localStorage.getItem('arcade:ui'); if (s === 'handheld' || s === 'desktop') return s; } catch (e) {}
+    const touch = matchMedia('(pointer: coarse)').matches || matchMedia('(hover: none)').matches;
+    return touch ? 'handheld' : 'desktop';
+  }
+  const KEYHINT = { up: '&uarr; / W', down: '&darr; / S', left: '&larr; / A', right: '&rarr; / D', a: 'Z / Space', b: 'X' };
+
   // labels: per-button caption; null hides a button the game does not use.
   const LABELS = { up:'Up', down:'Down', left:'Left', right:'Right', a:'A', b:'B' };
   function mount({ title, W, H, labels = {} }) {
@@ -44,10 +55,13 @@ window.Arcade = (() => {
     document.documentElement.style.setProperty('--ar', W + ' / ' + H);
     const L = { ...LABELS, ...labels };
     const btn = (cls, k, small) => `<div class="btn ${cls}${L[k] === null ? ' off' : ''}"><button data-k="${k}" aria-label="${L[k] || k}"></button>${small ? '' : `<label>${L[k] || ''}</label>`}</div>`;
+    const rows = ['up', 'left', 'right', 'down', 'a', 'b'].filter((k) => L[k] !== null).map((k) => [KEYHINT[k], L[k]])
+      .concat([['Enter / P', 'Pause'], ['R', 'Reset'], ['Esc', 'Menu']]);
+    const legend = rows.map(([k, v]) => `<div class="row"><kbd>${k}</kbd>${v}</div>`).join('');
     const root = document.createElement('div');
     root.className = 'gb';
     root.innerHTML = `
-      <div class="top"><a href="../">&larr; menu</a><span></span></div>
+      <div class="top"><a href="../">&larr; menu</a><span></span><button class="ui-toggle" type="button"></button></div>
       <div class="screen"><canvas></canvas></div>
       <div class="left">
         <div class="small">
@@ -61,9 +75,18 @@ window.Arcade = (() => {
         ${btn('u', 'up')}${btn('l', 'left')}${btn('r', 'right')}${btn('d', 'down')}
         <div class="mark"><i class="mu">&#9650;</i><i class="ml">&#9664;</i><i class="mr">&#9654;</i><i class="md">&#9660;</i></div>
       </div></div>
+      <div class="legend"><b>Controls</b><div class="rows">${legend}</div></div>
       <p class="hint">Arrows / WASD &middot; Z or Space = A &middot; X = B &middot; Enter / P = Pause &middot; R = Reset &middot; Esc = Menu</p>`;
     document.body.appendChild(root);
     root.querySelector('.top span').textContent = title;
+    const toggle = root.querySelector('.ui-toggle');
+    const setMode = (m, save) => {
+      document.documentElement.dataset.ui = m;
+      toggle.textContent = m === 'desktop' ? 'On-screen buttons' : 'Keyboard view';
+      if (save) { try { localStorage.setItem('arcade:ui', m); } catch (e) {} }
+    };
+    setMode(uiMode(), false);
+    toggle.addEventListener('click', () => setMode(document.documentElement.dataset.ui === 'desktop' ? 'handheld' : 'desktop', true));
     root.querySelectorAll('button[data-k]').forEach((b) => bindButton(b, b.dataset.k));
     handlers.select.push(() => { location.href = '../'; });
     handlers.reset.push(() => { location.reload(); });

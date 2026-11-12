@@ -19,3 +19,9 @@ p.sub { text-align:center; margin:0 0 16px; font-size:.85rem; color:#5a4a08; }
 .card .hi { color:var(--ink); font-size:.75rem; font-weight:700; }
 footer { margin-top:22px; text-align:center; color:#5a4a08; font-size:.75rem; }
 footer a { color:inherit; }
+
+/* Computers: wider launcher */
+@media (min-width: 760px) {
+  main { max-width: 960px; padding: 24px 28px 36px; }
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
